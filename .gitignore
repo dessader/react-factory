@@ -27,3 +27,8 @@ Thumbs.db
 .nx/migrate-runs
 vite.config.*.timestamp*
 vitest.config.*.timestamp*
+
+# Next.js
+.next
+out
+next-env.d.ts
