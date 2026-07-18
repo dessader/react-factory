@@ -1,0 +1,5 @@
+/dist
+/coverage
+/.nx/cache
+/.nx/workspace-data
+.nx/self-healing
