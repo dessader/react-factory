@@ -1,9 +1,15 @@
 import nx from "@nx/eslint-plugin";
+import type { Linter } from "eslint";
+import { defineConfig } from "eslint/config";
 
-export default [
-  ...nx.configs["flat/base"],
-  ...nx.configs["flat/typescript"],
-  ...nx.configs["flat/javascript"],
+const nxBase = nx.configs["flat/base"] as Linter.Config[];
+const nxTypescript = nx.configs["flat/typescript"] as Linter.Config[];
+const nxJavascript = nx.configs["flat/javascript"] as Linter.Config[];
+
+export default defineConfig([
+  ...nxBase,
+  ...nxTypescript,
+  ...nxJavascript,
   {
     ignores: ["**/dist", "**/out-tsc"],
   },
@@ -14,7 +20,7 @@ export default [
         "error",
         {
           enforceBuildableLibDependency: true,
-          allow: ["^.*/eslint(\\.base)?\\.config\\.[cm]?[jt]s$"],
+          allow: ["^.*/eslint(\\.base)?\\.config(\\.[cm]?[jt]s)?$"],
           depConstraints: [
             {
               sourceTag: "*",
@@ -36,7 +42,6 @@ export default [
       "**/*.cjs",
       "**/*.mjs",
     ],
-    // Override or add rules here
     rules: {},
   },
-];
+]);

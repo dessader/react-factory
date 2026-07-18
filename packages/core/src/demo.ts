@@ -1,1 +1,1 @@
-export const demo = () => 'demo';
+export const demo = () => "demo";

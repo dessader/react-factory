@@ -1,6 +1,7 @@
-import baseConfig from "../../eslint.config.mjs";
+import { defineConfig } from "eslint/config";
+import baseConfig from "../../eslint.config";
 
-export default [
+export default defineConfig([
   ...baseConfig,
   {
     files: ["**/*.json"],
@@ -22,4 +23,4 @@ export default [
   {
     ignores: ["**/out-tsc"],
   },
-];
+]);
