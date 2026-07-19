@@ -18,7 +18,7 @@ export const createComponent = <
     element,
     name,
     memo,
-    polymorphic,
+    polymorphic = true as TPolymorphic,
     Render,
   }: CreateComponentFactoryOptions<TElement, TCustomProps> & {
     polymorphic?: TPolymorphic;
