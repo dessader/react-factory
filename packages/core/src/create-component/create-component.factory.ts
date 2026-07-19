@@ -75,10 +75,14 @@ export const createComponent = <
     FactoryComponent.displayName = resolvedName;
 
     if (memo) {
-      return reactMemo(
+      const MemoizedFactoryComponent = reactMemo(
         FactoryComponent,
         typeof memo === "function" ? memo : undefined,
-      ) as typeof FactoryComponent;
+      );
+
+      MemoizedFactoryComponent.displayName = resolvedName;
+
+      return MemoizedFactoryComponent as typeof FactoryComponent;
     }
     return FactoryComponent;
   };
