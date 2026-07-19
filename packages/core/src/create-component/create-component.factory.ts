@@ -26,6 +26,27 @@ export const createComponent = <
     const resolvedElement = element ?? ("div" as TElement);
     const resolvedName = name ?? getComponentDisplayName(resolvedElement);
 
+    const tagResolvedComponent = (
+      node: ReactNode,
+      resolvedComponentName: string | undefined,
+    ): ReactNode => {
+      if (!isValidElement(node)) {
+        return node;
+      }
+
+      const existingOrigin = (node.props as Record<string, unknown>)[
+        "data-origin-component"
+      ];
+
+      return cloneElement(node, {
+        ...(resolvedComponentName !== undefined && {
+          "data-resolved-component": resolvedComponentName,
+        }),
+        "data-origin-component":
+          typeof existingOrigin === "string" ? existingOrigin : resolvedName,
+      } as never);
+    };
+
     const FactoryComponent = <TAs extends ElementType = TElement>(
       props: CreateComponentFactoryComponentProps<
         TAs,
@@ -36,9 +57,15 @@ export const createComponent = <
       const { component, ...cleanedProps } = props as {
         component?: TAs;
       } & object;
+
       const resolvedComponent = polymorphic
         ? (component ?? resolvedElement)
         : resolvedElement;
+
+      const resolvedComponentName =
+        polymorphic && component !== undefined
+          ? getComponentDisplayName(resolvedComponent)
+          : undefined;
 
       const result = Render(
         resolvedComponent as TElement,
@@ -48,23 +75,11 @@ export const createComponent = <
         >,
       );
 
-      if (result instanceof Promise) {
-        return result.then((resolved) =>
-          isValidElement(resolved)
-            ? cloneElement(resolved, {
-                "data-component": resolvedName,
-              } as never)
-            : resolved,
-        );
-      }
-
-      if (isValidElement(result)) {
-        return cloneElement(result, {
-          "data-component": resolvedName,
-        } as never);
-      }
-
-      return result;
+      return result instanceof Promise
+        ? result.then((node) =>
+            tagResolvedComponent(node, resolvedComponentName),
+          )
+        : tagResolvedComponent(result, resolvedComponentName);
     };
 
     FactoryComponent.displayName = resolvedName;
