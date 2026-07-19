@@ -17,5 +17,8 @@
     "dist",
     "!**/*.tsbuildinfo"
   ],
-  "dependencies": {}
+  "dependencies": {},
+  "peerDependencies": {
+    "react": "^19.0.0"
+  }
 }
