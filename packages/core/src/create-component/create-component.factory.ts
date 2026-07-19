@@ -33,17 +33,12 @@ export const createComponent = <
         TPolymorphic
       >,
     ): ReactNode => {
-      let resolvedComponent: ElementType;
-      let cleanedProps: object;
-
-      if (polymorphic) {
-        const { component, ...rest } = props as { component?: TAs } & object;
-        resolvedComponent = component ?? resolvedElement;
-        cleanedProps = rest;
-      } else {
-        resolvedComponent = resolvedElement;
-        cleanedProps = props;
-      }
+      const { component, ...cleanedProps } = props as {
+        component?: TAs;
+      } & object;
+      const resolvedComponent = polymorphic
+        ? (component ?? resolvedElement)
+        : resolvedElement;
 
       const result = Render(
         resolvedComponent as TElement,
