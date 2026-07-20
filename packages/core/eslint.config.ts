@@ -12,6 +12,8 @@ export default defineConfig([
           ignoredFiles: [
             "{projectRoot}/eslint.config.{js,cjs,mjs,ts,cts,mts}",
             "{projectRoot}/vite.config.{js,ts,mjs,mts}",
+            "{projectRoot}/test-setup.{js,ts,mjs,mts}",
+            "{projectRoot}/src/**/*.{test,spec}.{js,ts,jsx,tsx}",
           ],
         },
       ],

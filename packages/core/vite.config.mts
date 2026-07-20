@@ -43,7 +43,8 @@ export default defineConfig(() => ({
     name: "@react-forge/core",
     watch: false,
     globals: true,
-    environment: "node",
+    environment: "jsdom",
+    setupFiles: ["./test-setup.ts"],
     include: ["{src,tests}/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}"],
     reporters: ["default"],
     coverage: {
