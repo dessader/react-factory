@@ -16,7 +16,6 @@ export const createComponent = <
     TPolymorphic extends boolean = true,
   >({
     element,
-    name,
     memo,
     polymorphic = true as TPolymorphic,
     Render,
@@ -24,7 +23,6 @@ export const createComponent = <
     polymorphic?: TPolymorphic;
   }) => {
     const resolvedElement = element ?? ("div" as TElement);
-    const resolvedName = name ?? getComponentDisplayName(resolvedElement);
 
     const tagResolvedComponent = (
       node: ReactNode,
@@ -43,7 +41,9 @@ export const createComponent = <
           "data-resolved-component": resolvedComponentName,
         }),
         "data-origin-component":
-          typeof existingOrigin === "string" ? existingOrigin : resolvedName,
+          typeof existingOrigin === "string"
+            ? existingOrigin
+            : FactoryComponent.displayName,
       } as never);
     };
 
@@ -82,7 +82,7 @@ export const createComponent = <
         : tagResolvedComponent(result, resolvedComponentName);
     };
 
-    FactoryComponent.displayName = resolvedName;
+    FactoryComponent.displayName = getComponentDisplayName(resolvedElement);
 
     if (memo) {
       const MemoizedFactoryComponent = reactMemo(
@@ -90,7 +90,14 @@ export const createComponent = <
         typeof memo === "function" ? memo : undefined,
       );
 
-      MemoizedFactoryComponent.displayName = resolvedName;
+      Object.defineProperty(MemoizedFactoryComponent, "displayName", {
+        get: () => FactoryComponent.displayName,
+        set: (value: string) => {
+          FactoryComponent.displayName = value;
+        },
+        enumerable: true,
+        configurable: true,
+      });
 
       return MemoizedFactoryComponent as typeof FactoryComponent;
     }

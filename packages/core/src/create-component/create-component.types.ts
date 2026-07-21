@@ -24,7 +24,6 @@ export type CreateComponentFactoryOptions<
   TCustomProps,
 > = {
   element?: TElement;
-  name?: string;
   memo?: CreateComponentFactoryMemoOption<TElement, TCustomProps>;
   polymorphic?: boolean;
   Render: CreateComponentFactoryRenderFunction<TElement, TCustomProps>;
