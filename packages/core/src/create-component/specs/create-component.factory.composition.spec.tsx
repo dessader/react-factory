@@ -11,13 +11,13 @@ describe("createComponent — composition of factory components", () => {
    */
   it("preserves the outer origin and reflects the swapped-in factory component in a two-level composition", () => {
     const Inner = createComponent()({
-      Render: (Tag, props) => <Tag {...props} />,
+      Render: (Component, props) => <Component {...props} />,
     });
     Inner.displayName = "InnerFactory";
 
     const Outer = createComponent()({
       element: "span",
-      Render: (Tag, props) => <Tag {...props} />,
+      Render: (Component, props) => <Component {...props} />,
     });
     Outer.displayName = "OuterFactory";
 
@@ -38,12 +38,12 @@ describe("createComponent — composition of factory components", () => {
   it("keeps the origin fixed at the first activation while resolved reflects the most recent dynamic swap", () => {
     const Innermost = createComponent()({
       element: "span",
-      Render: (Tag, props) => <Tag {...props} />,
+      Render: (Component, props) => <Component {...props} />,
     });
     Innermost.displayName = "Innermost";
 
     const Middle = createComponent()({
-      Render: (Tag, props) => <Tag {...props} />,
+      Render: (Component, props) => <Component {...props} />,
     });
     Middle.displayName = "Middle";
 
@@ -58,7 +58,7 @@ describe("createComponent — composition of factory components", () => {
 
     const Outer = createComponent()({
       element: "p",
-      Render: (Tag, props) => <Tag {...props} />,
+      Render: (Component, props) => <Component {...props} />,
     });
     Outer.displayName = "Outer";
 
@@ -79,12 +79,12 @@ describe("createComponent — composition of factory components", () => {
   it("cannot propagate origin/resolved through a composed component whose Render drops unknown props", () => {
     const Inner = createComponent<{ label: string }>()({
       element: "span",
-      Render: (Tag, { label }) => <Tag>{label}</Tag>,
+      Render: (Component, { label }) => <Component>{label}</Component>,
     });
     Inner.displayName = "Inner";
 
     const Outer = createComponent()({
-      Render: (Tag, props) => <Tag {...props} />,
+      Render: (Component, props) => <Component {...props} />,
     });
     Outer.displayName = "Outer";
 

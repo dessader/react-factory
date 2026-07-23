@@ -12,7 +12,7 @@ describe("createComponent (DOM rendering)", () => {
   it("renders the resolved host element with the expected content", () => {
     const Text = createComponent()({
       element: "p",
-      Render: (Tag, props) => <Tag {...props} />,
+      Render: (Component, props) => <Component {...props} />,
     });
     Text.displayName = "Text";
 
@@ -30,7 +30,7 @@ describe("createComponent (DOM rendering)", () => {
    */
   it("falls back to an auto-derived displayName when it is not set explicitly", () => {
     const Box = createComponent()({
-      Render: (Tag, props) => <Tag {...props} />,
+      Render: (Component, props) => <Component {...props} />,
     });
 
     render(<Box>fallback name</Box>);
@@ -51,7 +51,7 @@ describe("createComponent (DOM rendering)", () => {
   it("reflects a displayName reassigned after creation, even when memoized", () => {
     const MemoBox = createComponent()({
       memo: true,
-      Render: (Tag, props) => <Tag {...props} />,
+      Render: (Component, props) => <Component {...props} />,
     });
 
     MemoBox.displayName = "InitialName";
@@ -76,10 +76,10 @@ describe("createComponent (DOM rendering)", () => {
 
     const MemoBox = createComponent<{ counter: number }>()({
       memo: true,
-      Render: (Tag, { counter, ...rest }) => {
+      Render: (Component, { counter, ...rest }) => {
         renderSpy();
 
-        return <Tag {...rest}>{counter}</Tag>;
+        return <Component {...rest}>{counter}</Component>;
       },
     });
     MemoBox.displayName = "MemoBox";
@@ -115,10 +115,10 @@ describe("createComponent (DOM rendering)", () => {
 
     const MemoBox = createComponent<{ counter: number }>()({
       memo: true,
-      Render: (Tag, { counter, ...rest }) => {
+      Render: (Component, { counter, ...rest }) => {
         renderSpy();
 
-        return <Tag {...rest}>{counter}</Tag>;
+        return <Component {...rest}>{counter}</Component>;
       },
     });
     MemoBox.displayName = "MemoBox";
@@ -287,10 +287,10 @@ describe("createComponent — Render return value handling", () => {
   it("resolves a Promise<ReactNode> and tags the resolved valid element", async () => {
     const AsyncGreeting = createComponent()({
       element: "p",
-      Render: async (Tag, props) => {
+      Render: async (Component, props) => {
         await Promise.resolve();
 
-        return createElement(Tag, props);
+        return createElement(Component, props);
       },
     });
     AsyncGreeting.displayName = "AsyncGreeting";

@@ -10,7 +10,7 @@ describe("createComponent — cross-combinations", () => {
    */
   it("memo and polymorphic composition work together: correct displayName and data-resolved-component simultaneously", () => {
     const Inner = createComponent()({
-      Render: (Tag, props) => <Tag {...props} />,
+      Render: (Component, props) => <Component {...props} />,
     });
     Inner.displayName = "Inner";
 
@@ -18,10 +18,10 @@ describe("createComponent — cross-combinations", () => {
     const Outer = createComponent()({
       element: "span",
       memo: true,
-      Render: (Tag, props) => {
+      Render: (Component, props) => {
         renderSpy();
 
-        return <Tag {...props} />;
+        return <Component {...props} />;
       },
     });
     Outer.displayName = "Outer";
@@ -50,13 +50,13 @@ describe("createComponent — cross-combinations", () => {
     const Box = createComponent<{ counter: number; label: string }>()({
       polymorphic: false,
       memo: (prev, next) => prev.label === next.label,
-      Render: (Tag, { counter, label, ...rest }) => {
+      Render: (Component, { counter, label, ...rest }) => {
         renderSpy();
 
         return (
-          <Tag {...rest}>
+          <Component {...rest}>
             {label}-{counter}
-          </Tag>
+          </Component>
         );
       },
     });
@@ -101,10 +101,10 @@ describe("createComponent — cross-combinations", () => {
     const MemoAsync = createComponent<{ counter: number }>()({
       element: "p",
       memo: true,
-      Render: async (Tag, props) => {
+      Render: async (Component, props) => {
         await Promise.resolve();
 
-        return createElement(Tag, props);
+        return createElement(Component, props);
       },
     });
     MemoAsync.displayName = "MemoAsync";
@@ -128,11 +128,11 @@ describe("createComponent — cross-combinations", () => {
   it("uses auto-derived displayNames, not just explicit overrides, correctly during composition", () => {
     const Inner = createComponent()({
       element: "span",
-      Render: (Tag, props) => <Tag {...props} />,
+      Render: (Component, props) => <Component {...props} />,
     });
 
     const Outer = createComponent()({
-      Render: (Tag, props) => <Tag {...props} />,
+      Render: (Component, props) => <Component {...props} />,
     });
 
     render(<Outer component={Inner}>content</Outer>);

@@ -8,6 +8,43 @@ import type {
 } from "./create-component.types";
 import type { ElementType, ReactNode } from "react";
 
+/**
+ * Creates a React component factory bound to a custom props shape.
+ *
+ * This is a curried API: `createComponent<TCustomProps>()` returns a second
+ * function that accepts the actual {@link CreateComponentFactoryOptions}
+ * (`element`, `memo`, `polymorphic`, `Render`) and produces the component.
+ *
+ * The produced component:
+ * - Renders through the supplied `Render` function, passing it the resolved
+ *   element and cleaned-up props.
+ * - Is polymorphic by default (`polymorphic: true`): an optional `component`
+ *   prop lets callers swap the rendered element at call time.
+ * - Tags its rendered output with `data-origin-component` (the first/outermost
+ *   factory component in a composition chain) and, when polymorphism was
+ *   actually exercised, `data-resolved-component` (what it resolved to).
+ * - Can optionally be wrapped in `React.memo` via the `memo` option.
+ * - Automatically forwards `ref` to the resolved element — since the
+ *   factory's props type is derived via `ComponentPropsWithRef`, `ref` is
+ *   accepted as a plain prop (the React 19 way) and passed straight through
+ *   to whatever `Render` ends up rendering, with no `forwardRef` needed.
+ *
+ * @typeParam TCustomProps - The custom prop shape every component created
+ * by this factory accepts, in addition to the resolved element's own props.
+ * @returns A function that accepts {@link CreateComponentFactoryOptions} and
+ * returns the resulting React component.
+ *
+ * @example
+ * ```tsx
+ * const Text = createComponent<{ weight?: "normal" | "bold" }>()({
+ *   element: "p",
+ *   Render: (Component, { weight, ...rest }) => (
+ *     <Component style={{ fontWeight: weight === "bold" ? 700 : 400 }} {...rest} />
+ *   ),
+ * });
+ * Text.displayName = "Text";
+ * ```
+ */
 export const createComponent = <
   TCustomProps extends Record<string, unknown> = Record<never, never>,
 >() => {
@@ -24,6 +61,28 @@ export const createComponent = <
   }) => {
     const resolvedElement = element ?? ("div" as TElement);
 
+    /**
+     * Tags a `Render` result with the origin/resolved data attributes.
+     *
+     * `data-resolved-component` always reflects the innermost factory
+     * component (closest to the actual host element), since its own tag
+     * runs last and overwrites any outer wrapper's value.
+     * `data-origin-component` is only set when absent, so it keeps the
+     * outermost factory component's name when one factory component
+     * renders as another via `component`.
+     *
+     * Both attributes are read from `FactoryComponent.displayName` live
+     * (not a value frozen at creation time), so reassigning it after
+     * `createComponent()` returns — the standard React convention — is
+     * honored on every render, even for a memoized component.
+     *
+     * @param node - The value returned (or resolved) from `Render`.
+     * @param resolvedComponentName - The name to record as
+     * `data-resolved-component`, or `undefined` if polymorphism wasn't
+     * exercised for this call.
+     * @returns `node` unchanged if it isn't a valid React element,
+     * otherwise a clone of `node` with the data attributes applied.
+     */
     const tagResolvedComponent = (
       node: ReactNode,
       resolvedComponentName: string | undefined,
@@ -47,6 +106,16 @@ export const createComponent = <
       } as never);
     };
 
+    /**
+     * The component produced by this call to `createComponent()(...)`.
+     *
+     * Resolves the polymorphic `component` prop (if `polymorphic` is
+     * enabled and one was supplied), strips it out of the forwarded props,
+     * invokes `Render`, and tags the result — handling both synchronous
+     * results and `Promise<ReactNode>` (for async Server Components).
+     *
+     * @typeParam TAs - The element actually resolved for this render call.
+     */
     const FactoryComponent = <TAs extends ElementType = TElement>(
       props: CreateComponentFactoryComponentProps<
         TAs,
@@ -90,6 +159,10 @@ export const createComponent = <
         typeof memo === "function" ? memo : undefined,
       );
 
+      // Kept as a live getter/setter over FactoryComponent.displayName
+      // (rather than a one-off copy) so that renaming the memoized
+      // component after creation also updates what tagResolvedComponent
+      // reads on the next render.
       Object.defineProperty(MemoizedFactoryComponent, "displayName", {
         get: () => FactoryComponent.displayName,
         set: (value: string) => {

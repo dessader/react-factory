@@ -11,7 +11,7 @@ describe("createComponent — element & displayName resolution", () => {
    */
   it("defaults to a div when element is not provided", () => {
     const Box = createComponent()({
-      Render: (Tag, props) => <Tag {...props} />,
+      Render: (Component, props) => <Component {...props} />,
     });
 
     render(<Box>content</Box>);
@@ -29,7 +29,7 @@ describe("createComponent — element & displayName resolution", () => {
   it("renders the given intrinsic tag", () => {
     const Button = createComponent()({
       element: "button",
-      Render: (Tag, props) => <Tag {...props} />,
+      Render: (Component, props) => <Component {...props} />,
     });
 
     render(<Button>click me</Button>);
@@ -51,7 +51,7 @@ describe("createComponent — element & displayName resolution", () => {
 
     const Wrapped = createComponent()({
       element: Inner,
-      Render: (Tag, props) => <Tag {...props} />,
+      Render: (Component, props) => <Component {...props} />,
     });
 
     render(<Wrapped>inner content</Wrapped>);
@@ -77,7 +77,7 @@ describe("createComponent — element & displayName resolution", () => {
 
     const InputBox = createComponent()({
       element: Inner,
-      Render: (Tag, props) => <Tag {...props} />,
+      Render: (Component, props) => <Component {...props} />,
     });
 
     const RefProbe = () => {
@@ -102,7 +102,7 @@ describe("createComponent — element & displayName resolution", () => {
 
     const Wrapped = createComponent()({
       element: Anonymous,
-      Render: (Tag, props) => <Tag {...props} />,
+      Render: (Component, props) => <Component {...props} />,
     });
 
     expect(Wrapped.displayName).toBe("FactoryUnknownComponent");

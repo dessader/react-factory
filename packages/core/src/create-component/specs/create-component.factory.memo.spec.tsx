@@ -10,7 +10,7 @@ describe("createComponent — memo", () => {
    */
   it("is not wrapped in React.memo when memo is not passed", () => {
     const Box = createComponent()({
-      Render: (Tag, props) => <Tag {...props} />,
+      Render: (Component, props) => <Component {...props} />,
     });
 
     const internals = Box as unknown as { $$typeof?: symbol };
@@ -24,7 +24,7 @@ describe("createComponent — memo", () => {
   it("wraps in React.memo without a custom compare when memo: true", () => {
     const Box = createComponent()({
       memo: true,
-      Render: (Tag, props) => <Tag {...props} />,
+      Render: (Component, props) => <Component {...props} />,
     });
 
     const internals = Box as unknown as {
@@ -44,7 +44,7 @@ describe("createComponent — memo", () => {
 
     const Box = createComponent()({
       memo: compare,
-      Render: (Tag, props) => <Tag {...props} />,
+      Render: (Component, props) => <Component {...props} />,
     });
 
     const internals = Box as unknown as { compare?: unknown };
@@ -60,10 +60,10 @@ describe("createComponent — memo", () => {
     const renderSpy = vi.fn();
 
     const Box = createComponent<{ counter: number }>()({
-      Render: (Tag, { counter, ...rest }) => {
+      Render: (Component, { counter, ...rest }) => {
         renderSpy();
 
-        return <Tag {...rest}>{counter}</Tag>;
+        return <Component {...rest}>{counter}</Component>;
       },
     });
 
@@ -84,13 +84,13 @@ describe("createComponent — memo", () => {
 
     const Box = createComponent<{ counter: number; label: string }>()({
       memo: (prev, next) => prev.label === next.label,
-      Render: (Tag, { counter, label, ...rest }) => {
+      Render: (Component, { counter, label, ...rest }) => {
         renderSpy();
 
         return (
-          <Tag {...rest}>
+          <Component {...rest}>
             {label}-{counter}
-          </Tag>
+          </Component>
         );
       },
     });
@@ -114,13 +114,13 @@ describe("createComponent — memo", () => {
 
     const Box = createComponent<{ counter: number; label: string }>()({
       memo: (prev, next) => prev.label === next.label,
-      Render: (Tag, { counter, label, ...rest }) => {
+      Render: (Component, { counter, label, ...rest }) => {
         renderSpy();
 
         return (
-          <Tag {...rest}>
+          <Component {...rest}>
             {label}-{counter}
-          </Tag>
+          </Component>
         );
       },
     });

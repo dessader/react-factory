@@ -11,7 +11,7 @@ describe("createComponent — polymorphic", () => {
    */
   it("is polymorphic by default and honors an explicit component prop", () => {
     const Box = createComponent()({
-      Render: (Tag, props) => <Tag {...props} />,
+      Render: (Component, props) => <Component {...props} />,
     });
     Box.displayName = "Box";
 
@@ -30,7 +30,7 @@ describe("createComponent — polymorphic", () => {
    */
   it("does not add data-resolved-component when polymorphic but no component prop is passed", () => {
     const Box = createComponent()({
-      Render: (Tag, props) => <Tag {...props} />,
+      Render: (Component, props) => <Component {...props} />,
     });
     Box.displayName = "Box";
 
@@ -50,7 +50,7 @@ describe("createComponent — polymorphic", () => {
   it("ignores an explicit component prop and does not leak it into the DOM when polymorphic: false", () => {
     const StrictBox = createComponent()({
       polymorphic: false,
-      Render: (Tag, props) => <Tag {...props} />,
+      Render: (Component, props) => <Component {...props} />,
     });
     StrictBox.displayName = "StrictBox";
 
@@ -75,7 +75,7 @@ describe("createComponent — polymorphic", () => {
   it("behaves like a plain render when polymorphic: false and no component prop is passed", () => {
     const StrictBox = createComponent()({
       polymorphic: false,
-      Render: (Tag, props) => <Tag {...props} />,
+      Render: (Component, props) => <Component {...props} />,
     });
     StrictBox.displayName = "StrictBox";
 
@@ -92,8 +92,8 @@ describe("createComponent — polymorphic", () => {
    * and the `component` key itself is stripped from the forwarded props.
    */
   it("calls Render with the swapped element and strips `component` from the forwarded props", () => {
-    const renderSpy = vi.fn((Tag: ElementType, props: object) => (
-      <Tag {...props} />
+    const renderSpy = vi.fn((Component: ElementType, props: object) => (
+      <Component {...props} />
     ));
 
     const Box = createComponent<{ label?: string }>()({

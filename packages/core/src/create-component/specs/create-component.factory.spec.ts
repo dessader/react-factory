@@ -17,11 +17,11 @@ describe("createComponent", () => {
    * component — a callable function, not some other kind of object.
    */
   it("returns a component function when the factory is invoked with options", () => {
-    const Component = createComponent()({
-      Render: (Tag, props) => createElement(Tag, props),
+    const FactoryComponent = createComponent()({
+      Render: (Component, props) => createElement(Component, props),
     });
 
-    expect(typeof Component).toBe("function");
+    expect(typeof FactoryComponent).toBe("function");
   });
 
   /**
@@ -30,13 +30,13 @@ describe("createComponent", () => {
    * whose `type` is the component itself.
    */
   it("produces a valid React element when rendered", () => {
-    const Component = createComponent()({
-      Render: (Tag, props) => createElement(Tag, props),
+    const FactoryComponent = createComponent()({
+      Render: (Component, props) => createElement(Component, props),
     });
 
-    const element = createElement(Component, { children: "hello" });
+    const element = createElement(FactoryComponent, { children: "hello" });
 
     expect(isValidElement(element)).toBe(true);
-    expect(element.type).toBe(Component);
+    expect(element.type).toBe(FactoryComponent);
   });
 });
