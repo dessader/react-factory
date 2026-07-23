@@ -1,0 +1,16 @@
+{
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "targets": {
+    "test-coverage": {
+      "executor": "nx:run-commands",
+      "options": {
+        "commands": [
+          "vitest run --coverage",
+          "npx serve -l 4100 test-output/vitest/coverage"
+        ],
+        "cwd": "packages/core",
+        "parallel": false
+      }
+    }
+  }
+}
