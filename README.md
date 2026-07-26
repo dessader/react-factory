@@ -2,6 +2,8 @@
 
 # React Forge
 
+[Motivation](#motivation) • [Get Started](#get-started) • [Examples](#examples) • [API](#api) • [FAQ](#faq)
+
 A lightweight factory for building type-safe, polymorphic React components.
 
 - 🪶 **Zero dependencies and minimal size** – less than 1 KB gzipped
@@ -13,6 +15,16 @@ A lightweight factory for building type-safe, polymorphic React components.
 > ⚛️ **Requires React 19 or later.**
 >
 > The library relies on passing `ref` as a plain prop and does not support `forwardRef`, since it's [deprecated](https://react.dev/reference/react/forwardRef). This is why only React 19 and above are supported.
+
+## Motivation
+
+Working across projects of very different scales, I kept running into the same handful of problems, over and over, each one requiring extra refactoring to work around:
+
+- **Components didn't support their root DOM node's native props.** Most components only expose a narrow, hand-picked set of custom props instead of extending the standard interface of the element they render. The result: even basic things like `className`, `id`, or a `data-*` attribute were often impossible to pass down.
+- **No `ref` forwarding to the root node.** This used to mean wrapping every component in `forwardRef`, which was already a chore. React 19 dropped that requirement, but the underlying problem didn't go away: most components still don't forward `ref` by default, which blocks integration with any third-party library that needs direct DOM access.
+- **No flexible way to swap the root element.** This is often needed to keep markup semantically correct, and sometimes for trickier cases too. The most common example: using a button's visual styling while actually rendering it as a link.
+
+React Forge grew out of that recurring friction. The goal was a single tool that encapsulates all of that logic, so you can just build components that support all of it out of the box: full type inference, polymorphism, `ref` handling, and one central abstraction you can adapt to your own needs.
 
 ## Get Started
 
@@ -96,3 +108,20 @@ Renders as:
   >Read the docs</a
 >
 ```
+
+## Examples
+
+_Coming soon._
+
+## API
+
+_Coming soon._
+
+## FAQ
+
+<details>
+<summary>Why is <code>Render</code> capitalized while other options are lowercase?</summary>
+
+Because `Render` is meant to be treated as a component by React's own tooling, not just as a plain callback. Both JSX itself and the `react-hooks/rules-of-hooks` ESLint rule decide whether something is "component-like" purely from its identifier's casing: PascalCase is treated as a component (or a `use`-prefixed function as a custom hook), anything else as an ordinary value or function. That's exactly the convention `Render` needs to satisfy, since it's expected to be able to call React hooks internally. Naming it `Render` (capitalized) is what lets the hooks linter recognize it as a valid place to call hooks, instead of flagging every hook call inside it as being outside a component or custom hook.
+
+</details>
