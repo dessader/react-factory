@@ -258,6 +258,66 @@ Renders to:
 
 `ref` itself never shows up in the DOM — it's a React-only mechanism for getting a handle to the underlying node, not an HTML attribute.
 
+### Async Server Components
+
+The function passed to `Render` can be asynchronous — this only works when it's used in a server environment (Server Components).
+
+```tsx
+import { createComponent } from "@react-forge/core";
+
+type Post = {
+  id: number;
+  title: string;
+};
+
+const fetchPosts = async (limit: number): Promise<Post[]> => {
+  const response = await fetch(
+    `https://jsonplaceholder.typicode.com/posts?_limit=${limit}`,
+  );
+
+  return response.json();
+};
+
+type PostListProps = {
+  limit: number;
+};
+
+const PostList = createComponent<PostListProps>()({
+  element: "ul",
+  Render: async (Component, { limit, ...props }) => {
+    const posts = await fetchPosts(limit);
+
+    return (
+      <Component {...props}>
+        {posts.map((post) => (
+          <li key={post.id}>{post.title}</li>
+        ))}
+      </Component>
+    );
+  },
+});
+
+PostList.displayName = "PostList";
+```
+
+```tsx
+// app/posts/page.tsx — a Server Component, no "use client"
+
+const PostsPage = () => <PostList limit={3} />;
+
+export default PostsPage;
+```
+
+Renders to:
+
+```html
+<ul data-origin-component="PostList">
+  <li>...</li>
+  <li>...</li>
+  <li>...</li>
+</ul>
+```
+
 ## Advanced
 
 ### Local wrapper around the factory

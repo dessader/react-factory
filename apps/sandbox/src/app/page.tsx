@@ -90,6 +90,9 @@ const HomePage = () => {
           <Input ref={inputRef} />
           <Input component="textarea" ref={(el) => console.log(el)} />
         </div>
+
+        <h3>Async Server Components</h3>
+        <a href="/posts">Open /posts (server-rendered)</a>
       </section>
     </main>
   );
