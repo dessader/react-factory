@@ -260,7 +260,7 @@ Renders to:
 
 ### Async Server Components
 
-The function passed to `Render` can be asynchronous — this only works when it's used in a server environment (Server Components).
+The function passed to `Render` can be async. This only works when it's used in a server environment (Server Components).
 
 ```tsx
 import { createComponent } from "@react-forge/core";
