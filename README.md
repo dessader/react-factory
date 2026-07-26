@@ -61,7 +61,202 @@ Text.displayName = "Text";
 
 ## Examples
 
-_Coming soon._
+### Custom root element (`element`)
+
+```tsx
+import { createComponent } from "@react-forge/core";
+
+const Card = createComponent()({
+  element: "article",
+  Render: (Component, props) => <Component {...props} />,
+});
+
+Card.displayName = "Card";
+
+// Usage
+<Card className="card" />
+```
+
+Renders to:
+
+```html
+<article class="card" data-origin-component="Card"></article>
+```
+
+### Custom props (`Render`)
+
+```tsx
+import { createComponent } from "@react-forge/core";
+
+type BadgeProps = {
+  count: number;
+};
+
+const Badge = createComponent<BadgeProps>()({
+  element: "span",
+  Render: (Component, { count, ...rest }) => (
+    <Component data-count={count} {...rest} />
+  ),
+});
+
+Badge.displayName = "Badge";
+
+// Usage
+<Badge count={3} />
+```
+
+Renders to:
+
+```html
+<span data-count="3" data-origin-component="Badge"></span>
+```
+
+### Polymorphism (`component` prop)
+
+```tsx
+import { createComponent } from "@react-forge/core";
+
+const Heading = createComponent()({
+  element: "h2",
+  Render: (Component, props) => <Component {...props} />,
+});
+
+Heading.displayName = "Heading";
+
+// Usage
+<Heading>Renders as an h2 by default</Heading>
+<Heading component="h1">Renders as an h1</Heading>
+<Heading component="a" href="/docs">
+  Renders as a link, fully typed against anchor props
+</Heading>
+```
+
+Renders to:
+
+```html
+<h2 data-origin-component="Heading">Renders as an h2 by default</h2>
+<h1 data-resolved-component="FactoryH1" data-origin-component="Heading">
+  Renders as an h1
+</h1>
+<a
+  href="/docs"
+  data-resolved-component="FactoryA"
+  data-origin-component="Heading"
+>
+  Renders as a link, fully typed against anchor props
+</a>
+```
+
+`data-resolved-component` only shows up once polymorphism is actually exercised — the default `<h2>` case above doesn't get one.
+
+### Disabling polymorphism (`polymorphic`)
+
+```tsx
+import { createComponent } from "@react-forge/core";
+
+const Form = createComponent()({
+  element: "form",
+  polymorphic: false,
+  Render: (Component, props) => <Component {...props} />,
+});
+
+Form.displayName = "Form";
+
+// Usage
+<Form action="/submit" />
+
+// Type error — `component` doesn't exist on Form's props:
+<Form component="div" />
+```
+
+Renders to:
+
+```html
+<form action="/submit" data-origin-component="Form"></form>
+```
+
+`data-resolved-component` can never appear here — there's no `component` prop to exercise.
+
+### Memoization (`memo`)
+
+```tsx
+import { createComponent } from "@react-forge/core";
+
+type AvatarProps = {
+  src: string;
+};
+
+// `true` uses React.memo's default shallow prop comparison
+const Avatar = createComponent<AvatarProps>()({
+  element: "img",
+  memo: true,
+  Render: (Component, { src, ...rest }) => (
+    <Component src={src} {...rest} />
+  ),
+});
+
+Avatar.displayName = "Avatar";
+
+type PriceProps = {
+  amount: number;
+};
+
+// A comparator function skips re-renders only when `amount` is unchanged,
+// ignoring any other prop
+const Price = createComponent<PriceProps>()({
+  element: "span",
+  memo: (prev, next) => prev.amount === next.amount,
+  Render: (Component, { amount, ...rest }) => (
+    <Component {...rest}>{amount}</Component>
+  ),
+});
+
+Price.displayName = "Price";
+
+// Usage
+<Avatar src="/avatar.png" />
+<Price amount={42} />
+```
+
+Renders to:
+
+```html
+<img src="/avatar.png" data-origin-component="Avatar" />
+<span data-origin-component="Price">42</span>
+```
+
+### Ref forwarding
+
+```tsx
+import { useRef } from "react";
+import { createComponent } from "@react-forge/core";
+
+const Input = createComponent()({
+  element: "input",
+  Render: (Component, props) => <Component {...props} />,
+});
+
+Input.displayName = "Input";
+
+// Usage
+const inputRef = useRef<HTMLInputElement>(null);
+<Input ref={inputRef} />
+
+// Typed as HTMLTextAreaElement | null once the root is swapped:
+<Input component="textarea" ref={(el) => console.log(el)} />
+```
+
+Renders to:
+
+```html
+<input data-origin-component="Input" />
+<textarea
+  data-resolved-component="FactoryTextarea"
+  data-origin-component="Input"
+></textarea>
+```
+
+`ref` itself never shows up in the DOM — it's a React-only mechanism for getting a handle to the underlying node, not an HTML attribute.
 
 ## Advanced
 

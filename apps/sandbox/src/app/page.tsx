@@ -1,13 +1,23 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Text } from "@/components/text";
 import { Button, Unmemoized } from "@/components/button";
 import { Link } from "@/components/link";
 import { Form } from "@/components/form";
+import {
+  Card,
+  Badge,
+  Heading,
+  StrictForm,
+  Avatar,
+  Price,
+  Input,
+} from "@/components/examples";
 
 const HomePage = () => {
   const [tick, setTick] = useState(0);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   return (
     <main>
@@ -45,6 +55,40 @@ const HomePage = () => {
           <Form action='/submit'>
             <button type='submit'>Submit</button>
           </Form>
+        </div>
+      </section>
+
+      <section>
+        <h2>Examples</h2>
+
+        <h3>Custom root element</h3>
+        <Card className="card">Card content</Card>
+
+        <h3>Custom props</h3>
+        <Badge count={3} />
+
+        <h3>Polymorphism</h3>
+        <div className="row">
+          <Heading>Renders as an h2 by default</Heading>
+          <Heading component="h1">Renders as an h1</Heading>
+          <Heading component="a" href="/docs">
+            Renders as a link, fully typed against anchor props
+          </Heading>
+        </div>
+
+        <h3>Disabling polymorphism</h3>
+        <StrictForm action="/submit" />
+
+        <h3>Memoization</h3>
+        <div className="row">
+          <Avatar src="/avatar.png" />
+          <Price amount={42} />
+        </div>
+
+        <h3>Ref forwarding</h3>
+        <div className="row">
+          <Input ref={inputRef} />
+          <Input component="textarea" ref={(el) => console.log(el)} />
         </div>
       </section>
     </main>
