@@ -34,80 +34,7 @@ React Forge grew out of that recurring friction. The goal was a single tool that
 npm install @react-forge/core
 ```
 
-### Basic usage
-
-```tsx
-import { createComponent } from "@react-forge/core";
-
-type TextProps = {
-  weight?: "normal" | "bold";
-};
-
-const Text = createComponent<TextProps>()({
-  element: "p",
-  Render: (Component, { weight, ...rest }) => (
-    <Component
-      style={{ fontWeight: weight === "bold" ? 700 : 400 }}
-      {...rest}
-    />
-  ),
-});
-
-Text.displayName = "Text";
-
-const App = () => <Text weight='bold'>Hello, React Forge!</Text>;
-```
-
-### Polymorphic components
-
-Every component is polymorphic by default: pass a `component` prop to render as a different element without changing the component's own props or behavior.
-
-```tsx
-const Box = createComponent()({
-  element: "div",
-  Render: (Component, props) => <Component {...props} />,
-});
-
-Box.displayName = "Box";
-
-// Renders a <section> instead of the default <div>
-<Box component='section'>Content</Box>;
-```
-
-`component` isn't limited to intrinsic tags — it accepts **any** React component, not just ones created with `createComponent`. When it happens to be another factory component, you also get that component's own typed props for free. Either way, the rendered element carries two data attributes: `data-origin-component` (who was originally invoked) and `data-resolved-component` (what it actually resolved to).
-
-```tsx
-type LinkProps = {
-  href: string;
-};
-
-const Link = createComponent<LinkProps>()({
-  element: "a",
-  Render: (Component, { href, ...rest }) => <Component href={href} {...rest} />,
-});
-
-Link.displayName = "Link";
-
-const Button = createComponent()({
-  element: "button",
-  Render: (Component, props) => <Component {...props} />,
-});
-
-Button.displayName = "Button";
-
-// `href` is required here — it's typed from Link, not from Button
-<Button component={Link} href='/docs'>
-  Read the docs
-</Button>;
-```
-
-Renders as:
-
-```html
-<a href="/docs" data-resolved-component="Link" data-origin-component="Button"
-  >Read the docs</a
->
-```
+_Coming soon._
 
 ## Examples
 
@@ -121,7 +48,7 @@ _Coming soon._
 
 <details>
 <summary>Why is <code>Render</code> capitalized while other options are lowercase?</summary>
-
+<br />
 Because `Render` is meant to be treated as a component by React's own tooling, not just as a plain callback. Both JSX itself and the `react-hooks/rules-of-hooks` ESLint rule decide whether something is "component-like" purely from its identifier's casing: PascalCase is treated as a component (or a `use`-prefixed function as a custom hook), anything else as an ordinary value or function. That's exactly the convention `Render` needs to satisfy, since it's expected to be able to call React hooks internally. Naming it `Render` (capitalized) is what lets the hooks linter recognize it as a valid place to call hooks, instead of flagging every hook call inside it as being outside a component or custom hook.
 
 </details>
