@@ -4,14 +4,15 @@
 
 A lightweight factory for building type-safe, polymorphic React components.
 
-- ⭐ **Zero dependencies**
-- ⭐ **Minimal footprint** – 0.6 KB gzipped
-- ⭐ **Fully typed** — end-to-end type inference for props
-- ⭐ **Native props out of the box** — every component comes with the full set of props of its underlying DOM element, or of whatever component it's swapped to, merged together with your own custom props
-- ⭐ **Automatic ref forwarding** — `ref` is passed straight through to the resolved element, no `forwardRef` needed
-- ⭐ **SSR-ready & async-aware** — fully support for Server Components
+- 🪶 **Zero dependencies and minimal size** – less than 1 KB gzipped
+- 🔀 **Polymorphism support** – swap the root element with another DOM node or React component
+- 🛡️ **Fully typed** – every component infers its prop types from the default root element, and also accounts for the props of whatever element or component is swapped in via the polymorphic prop
+- 🔗 **Automatic ref forwarding** – `ref` is passed straight through to the resolved root, keeping components fully open for customization, direct DOM node access, and integration with third-party libraries
+- ⚡ **SSR-ready & async-aware** – fully support for Server Components
 
-⚛️ Requires React 19 or later.
+> ⚛️ **Requires React 19 or later.**
+>
+> The library relies on passing `ref` as a plain prop and does not support `forwardRef`, since it's [deprecated](https://react.dev/reference/react/forwardRef). This is why only React 19 and above are supported.
 
 ## Get Started
 
