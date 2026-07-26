@@ -1,0 +1,125 @@
+:root {
+  color-scheme: light dark;
+  --color-bg: #0b0c10;
+  --color-surface: #16181d;
+  --color-border: #2a2d34;
+  --color-text: #f5f5f7;
+  --color-muted: #9a9ea6;
+  --color-accent: #6ea8fe;
+}
+
+@media (prefers-color-scheme: light) {
+  :root {
+    --color-bg: #f5f5f7;
+    --color-surface: #ffffff;
+    --color-border: #e1e3e8;
+    --color-text: #17181c;
+    --color-muted: #6b7280;
+    --color-accent: #2563eb;
+  }
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-family:
+    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial,
+    sans-serif;
+}
+
+main {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 2.5rem 1.5rem 4rem;
+}
+
+h1 {
+  font-size: 1.5rem;
+  margin: 0 0 2rem;
+}
+
+section {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+section h2 {
+  font-size: 1.05rem;
+  margin: 0 0 1rem;
+}
+
+section p {
+  color: var(--color-muted);
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+code {
+  background: var(--color-border);
+  border-radius: 4px;
+  padding: 0.1rem 0.35rem;
+  font-size: 0.85em;
+}
+
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+button {
+  font: inherit;
+  cursor: pointer;
+  background: var(--color-accent);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 0.5rem 1rem;
+}
+
+button:hover {
+  opacity: 0.9;
+}
+
+a {
+  color: var(--color-accent);
+  text-decoration: none;
+  font-weight: 500;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+form {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.render-count {
+  display: inline-block;
+  margin-left: 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 400;
+  color: rgb(255 255 255 / 70%);
+}
+
+[data-tone="accent"] {
+  color: var(--color-accent);
+  font-weight: 600;
+}
+
+[data-tone="muted"] {
+  color: var(--color-muted);
+}
