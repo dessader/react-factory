@@ -13,8 +13,8 @@ type BadgeProps = {
 
 export const Badge = createComponent<BadgeProps>()({
   element: "span",
-  Render: (Component, { count, ...rest }) => (
-    <Component data-count={count} {...rest} />
+  Render: (Component, { count, ...props }) => (
+    <Component data-count={count} {...props} />
   ),
 });
 
@@ -43,8 +43,8 @@ type AvatarProps = {
 export const Avatar = createComponent<AvatarProps>()({
   element: "img",
   memo: true,
-  Render: (Component, { src, ...rest }) => (
-    <Component src={src} {...rest} />
+  Render: (Component, { src, ...props }) => (
+    <Component src={src} {...props} />
   ),
 });
 
@@ -59,8 +59,8 @@ type PriceProps = {
 export const Price = createComponent<PriceProps>()({
   element: "span",
   memo: (prev, next) => prev.amount === next.amount,
-  Render: (Component, { amount, ...rest }) => (
-    <Component {...rest}>{amount}</Component>
+  Render: (Component, { amount, ...props }) => (
+    <Component {...props}>{amount}</Component>
   ),
 });
 

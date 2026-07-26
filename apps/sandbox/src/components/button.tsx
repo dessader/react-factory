@@ -9,12 +9,12 @@ type ButtonProps = {
 
 export const Button = createComponent<ButtonProps>()({
   element: "button",
-  Render: (Component, { variant, children, ...rest }) => {
+  Render: (Component, { variant, children, ...props }) => {
     const renderCount = useRef(0);
     renderCount.current += 1;
 
     return (
-      <Component data-variant={variant} {...rest}>
+      <Component data-variant={variant} {...props}>
         {children}
         <span className="render-count" suppressHydrationWarning>
           renders: {renderCount.current}
@@ -29,12 +29,12 @@ Button.displayName = "Button";
 // Still memoized by default, but a single component can opt out:
 export const Unmemoized = createComponent()({
   memo: false,
-  Render: (Component, { children, ...rest }) => {
+  Render: (Component, { children, ...props }) => {
     const renderCount = useRef(0);
     renderCount.current += 1;
 
     return (
-      <Component {...rest}>
+      <Component {...props}>
         {children}
         <span className="render-count" suppressHydrationWarning>
           renders: {renderCount.current}

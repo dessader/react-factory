@@ -6,8 +6,8 @@ type TextProps = {
 
 export const Text = createComponent<TextProps>()({
   element: "p",
-  Render: (Component, { tone, ...rest }) => (
-    <Component data-tone={tone} {...rest} />
+  Render: (Component, { tone, ...props }) => (
+    <Component data-tone={tone} {...props} />
   ),
 });
 

@@ -45,8 +45,8 @@ type TextProps = {
 
 const Text = createComponent<TextProps>()({
   element: "p",
-  Render: (Component, { tone, ...rest }) => (
-    <Component data-tone={tone} {...rest} />
+  Render: (Component, { tone, ...props }) => (
+    <Component data-tone={tone} {...props} />
   ),
 });
 
@@ -94,8 +94,8 @@ type BadgeProps = {
 
 const Badge = createComponent<BadgeProps>()({
   element: "span",
-  Render: (Component, { count, ...rest }) => (
-    <Component data-count={count} {...rest} />
+  Render: (Component, { count, ...props }) => (
+    <Component data-count={count} {...props} />
   ),
 });
 
@@ -190,8 +190,8 @@ type AvatarProps = {
 const Avatar = createComponent<AvatarProps>()({
   element: "img",
   memo: true,
-  Render: (Component, { src, ...rest }) => (
-    <Component src={src} {...rest} />
+  Render: (Component, { src, ...props }) => (
+    <Component src={src} {...props} />
   ),
 });
 
@@ -206,8 +206,8 @@ type PriceProps = {
 const Price = createComponent<PriceProps>()({
   element: "span",
   memo: (prev, next) => prev.amount === next.amount,
-  Render: (Component, { amount, ...rest }) => (
-    <Component {...rest}>{amount}</Component>
+  Render: (Component, { amount, ...props }) => (
+    <Component {...props}>{amount}</Component>
   ),
 });
 
@@ -306,8 +306,8 @@ type ButtonProps = {
 
 const Button = createComponent<ButtonProps>()({
   element: "button",
-  Render: (Component, { variant, ...rest }) => (
-    <Component data-variant={variant} {...rest} />
+  Render: (Component, { variant, ...props }) => (
+    <Component data-variant={variant} {...props} />
   ),
 });
 
