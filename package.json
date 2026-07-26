@@ -6,6 +6,7 @@
   "scripts": {},
   "private": true,
   "devDependencies": {
+    "@changesets/cli": "^2.31.1",
     "@eslint/js": "^9.8.0",
     "@next/eslint-plugin-next": "^16.1.6",
     "@nx/eslint": "23.1.0",
