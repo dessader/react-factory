@@ -2,7 +2,7 @@
 
 # React Forge
 
-[Motivation](#motivation) • [Get Started](#get-started) • [Examples](#examples) • [Advanced](#advanced) • [API](#api) • [FAQ](#faq)
+[Motivation](#motivation) • [Get Started](#get-started) • [Examples](#examples) • [Advanced](#advanced) • [Additional](#additional) • [API](#api) • [FAQ](#faq)
 
 A lightweight factory for building type-safe, polymorphic React components.
 
@@ -74,7 +74,7 @@ const Card = createComponent()({
 Card.displayName = "Card";
 
 // Usage
-<Card className="card" />
+<Card className='card' />;
 ```
 
 Renders to:
@@ -102,7 +102,7 @@ const Badge = createComponent<BadgeProps>()({
 Badge.displayName = "Badge";
 
 // Usage
-<Badge count={3} />
+<Badge count={3} />;
 ```
 
 Renders to:
@@ -368,28 +368,59 @@ const Form = createStrictComponent()({
 Form.displayName = "Form";
 ```
 
+## Additional
+
+### Component metadata
+
+Every component created by the factory tags its rendered output with `data-*` attributes, so you can inspect what actually got rendered directly in the DOM or devtools.
+
+Two attributes are involved:
+
+- **`data-origin-component`** — the name of the outermost factory component in a composition chain. It's only set when absent, so if a factory component is passed as another factory component's `component` prop, the name of the one that started the chain is preserved, not overwritten by the inner one.
+- **`data-resolved-component`** — the name of what the component actually resolved to, but only when polymorphism was exercised for that particular call (i.e. a `component` prop was supplied). It's absent otherwise — see the [Polymorphism](#polymorphism-component-prop) example above.
+
+Both names are read from the component's `displayName` live, at render time — not captured once when the component was created. That means reassigning `displayName` after the fact (the standard React convention, e.g. `Box.displayName = "Box"`) is picked up on the very next render, and this holds even for memoized components.
+
+### Component naming
+
+The factory has no way to know what variable you assign its return value to. `const Box = createComponent()({ ... })` cannot make the resulting component call itself `"Box"` at runtime: by the time `createComponent()({ ... })` finishes executing, the variable `Box` doesn't exist yet, and JavaScript never passes an "assignment target" into the function being assigned — there's no call-context to read a name from. Stack-trace-based tricks exist, but they're unreliable (broken by minification, inconsistent across engines) and expensive to run per component. The only way to solve this properly is a build-time plugin (Babel/SWC) that rewrites the call site — a real option, but one that's rarely worth adopting for a single project.
+
+This is the trade-off: **you're expected to set `displayName` by hand** on anything you want to recognize in React DevTools, error messages, or the `data-origin-component`/`data-resolved-component` attributes above:
+
+```tsx
+const Box = createComponent()({ ... });
+Box.displayName = "Box";
+```
+
+If you skip this, the factory still assigns a fallback `displayName` automatically, derived from the resolved default `element`:
+
+- For intrinsic (string) elements, the tag is capitalized and prefixed with `Factory` — `"div"` becomes `"FactoryDiv"`, `"span"` becomes `"FactorySpan"`, and so on.
+- For component elements (when `element` is itself a component), it uses that component's own `displayName`, falling back to its `.name`, and finally to `"FactoryUnknownComponent"` if neither is available.
+
+This fallback is also what powers `data-resolved-component` when a polymorphic `component` prop is supplied without an explicit name attached to it (e.g. `<Heading component="a" />` resolving to `FactoryA`, as shown in the [Polymorphism](#polymorphism-component-prop) example).
+
 ## API
 
 ### `createComponent<TCustomProps>()(options)`
 
 Options accepted by the second call, i.e. the descriptor passed to `createComponent<TCustomProps>()({ ... })`:
 
-| Property      | Type                                                  | Default     | Description                                                                                                                                                        |
-| ------------- | ----------------------------------------------------- | ----------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `element`     | `ElementType`                                          | `"div"`     | The default host tag or component rendered when no polymorphic `component` prop is supplied at call time.                                                        |
-| `Render`      | `(Component, props) => ReactNode \| Promise<ReactNode>` | _required_  | Produces the actual output for the resolved element and cleaned-up props. May be async for Server Components.                                                    |
-| `memo`        | `boolean \| (prev, next) => boolean`                   | `undefined` | Wraps the resulting component in `React.memo`. `true` uses the default shallow comparison; a function supplies a custom comparator. Omitted/`false` skips memoization. |
-| `polymorphic` | `boolean`                                               | `true`      | Whether the resulting component accepts a `component` prop that swaps the rendered element at call time. `false` removes `component` from the type entirely.    |
+| Property      | Type                                                    | Default     | Description                                                                                                                                                            |
+| ------------- | ------------------------------------------------------- | ----------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `element`     | `ElementType`                                           | `"div"`     | The default host tag or component rendered when no polymorphic `component` prop is supplied at call time.                                                              |
+| `Render`      | `(Component, props) => ReactNode \| Promise<ReactNode>` | _required_  | Produces the actual output for the resolved element and cleaned-up props. May be async for Server Components.                                                          |
+| `memo`        | `boolean \| (prev, next) => boolean`                    | `undefined` | Wraps the resulting component in `React.memo`. `true` uses the default shallow comparison; a function supplies a custom comparator. Omitted/`false` skips memoization. |
+| `polymorphic` | `boolean`                                               | `true`      | Whether the resulting component accepts a `component` prop that swaps the rendered element at call time. `false` removes `component` from the type entirely.           |
 
 ### Produced component props
 
 Props accepted by the component returned from `createComponent<TCustomProps>()({ ... })`:
 
-| Property    | Type          | Default                         | Description                                                                                                    |
-| ----------- | ------------- | -------------------------------- | ---------------------------------------------------------------------------------------------------------------- |
-| `component` | `ElementType` | `element` from the descriptor    | Swaps the rendered element for this call only. Only present when `polymorphic` is `true` (the default).       |
-| `ref`       | inferred      | —                                 | Forwarded straight to the resolved root — typed per the actually rendered element, no `forwardRef` required. |
-| ...         | `TCustomProps & native props of the resolved element` | — | Everything else: your custom props plus the resolved element's own native props (custom props win on name conflicts). |
+| Property    | Type                                                  | Default                       | Description                                                                                                           |
+| ----------- | ----------------------------------------------------- | ----------------------------- | --------------------------------------------------------------------------------------------------------------------- |
+| `component` | `ElementType`                                         | `element` from the descriptor | Swaps the rendered element for this call only. Only present when `polymorphic` is `true` (the default).               |
+| `ref`       | inferred                                              | —                             | Forwarded straight to the resolved root — typed per the actually rendered element, no `forwardRef` required.          |
+| ...         | `TCustomProps & native props of the resolved element` | —                             | Everything else: your custom props plus the resolved element's own native props (custom props win on name conflicts). |
 
 ## FAQ
 
