@@ -326,11 +326,14 @@ Renders to:
 
 Directly importing the factory from the package into each component of your project is a valid approach, but you may miss out on some of the fundamental benefits. A best practice when working with important dependencies that permeate the entire project is to create a thin wrapper—also known as a facade—that encapsulates interactions with the external package, and then use this facade throughout the project. This approach offers a number of advantages:
 
-- **Resilience to change**. Even if something changes in an external dependency—whether it’s breaking changes or useful new features — you can always apply them at a single “single point of truth” and thereby propagate them throughout the entire project, rather than having to undertake a large-scale refactoring of the codebase.
+- **Resilience to change**. Even if something changes in an external dependency, whether it’s breaking changes or useful new features — you can always apply them at a single “single point of truth” and thereby propagate them throughout the entire project, rather than having to undertake a large-scale refactoring of the codebase.
+- **Unified Abstraction**. The Factory pattern involves creating a set of entities, and if you import the factory directly from a package, you lose full control and are forced to make the necessary configuration changes on a case-by-case basis.
 
----
+The `createComponent` factory is good on its own, but if you build a thin facade around it, you'll further ensure the code base's resilience to changes and gain even more flexibility and capabilities.
 
-`createComponent` is a good candidate for exactly this treatment, and wrapping it locally is the recommended approach. Rather than importing it directly into every component file, wrap it once, and let every component in the app go through that single entry point — so app-wide defaults live in one file and can evolve without touching every call site:
+#### Basic Usage
+
+The simplest option is to simply create a wrapper around the factory and use that wrapper to create components. If at any point you want to change any settings, you only have to do it once:
 
 ```tsx
 // lib/create-component.ts
@@ -386,11 +389,15 @@ const Unmemoized = createComponent()({
 });
 ```
 
-Every component created through this facade's `createComponent` picks up the shared default, while `Unmemoized` shows a per-component override still works — the facade only sets a default, it doesn't lock the option in.
+Every component created using this wrapper around `createComponent` uses the default memoization settings; however, the `Unmemoized` component can override this behavior locally.
 
-### Multiple factories
+#### Multiple factories
 
-The same idea extends naturally to more than one facade. Instead of a single general-purpose `createComponent`, a codebase can expose a small set of purpose-built ones — for example, `createPolymorphicComponent` for components that should always support the `component` swap prop, and `createStrictComponent` for components with a semantic constraint on their root element (a `<Form>` that must always render as `<form>`, never as `<div>`):
+The idea of using wrappers around the factory can be taken even further; you can create several variants for different use cases:
+
+- `createPolymorphicComponent` - components that explicitly support polymorphism
+- `createStrictComponent` – strict components that must always contain a single semantic element and ensure its stability (e.g., `<form />`, `<input />`)
+- `create<WhatDoYouWant>Component` – any other factory settings or custom modifications and enhancements
 
 ```tsx
 // lib/create-component.ts
@@ -440,30 +447,33 @@ Form.displayName = "Form";
 
 Every component created by the factory tags its rendered output with `data-*` attributes, so you can inspect what actually got rendered directly in the DOM or devtools.
 
-Two attributes are involved:
+This is particularly relevant when using libraries that promote an atomic approach to styling, where elements do not contain short, semantic `className` attributes but instead have a large set of disparate utility classes that make it difficult to identify DOM nodes when working in DevTools. Technically, you can open React DevTools, but for simple tasks, this isn’t always the most convenient way to quickly identify elements for easy debugging.
 
-- **`data-origin-component`** — the name of the outermost factory component in a composition chain. It's only set when absent, so if a factory component is passed as another factory component's `component` prop, the name of the one that started the chain is preserved, not overwritten by the inner one.
-- **`data-resolved-component`** — the name of what the component actually resolved to, but only when polymorphism was exercised for that particular call (i.e. a `component` prop was supplied). It's absent otherwise — see the [Polymorphism](#polymorphism-component-prop) example above.
+The factory provides two attributes:
 
-Both names are read from the component's `displayName` live, at render time — not captured once when the component was created. That means reassigning `displayName` after the fact (the standard React convention, e.g. `Box.displayName = "Box"`) is picked up on the very next render, and this holds even for memoized components.
+- `data-origin-component` — name of the main factory component.
+- `data-resolved-component` — name of the resolved component when polymorphism is used.
 
-### Component naming
+For example, suppose you created a `<Button />` component and, when using it, wanted to render its root element as a link: `<Button component={Link} />`. In this case, `data-origin-component` will be set to `Button` (our main component), and `data-resolved-component` will be set to the name of the component into which the Button component was resolved - that is `Link`.
 
-The factory has no way to know what variable you assign its return value to. `const Box = createComponent()({ ... })` cannot make the resulting component call itself `"Box"` at runtime: by the time `createComponent()({ ... })` finishes executing, the variable `Box` doesn't exist yet, and JavaScript never passes an "assignment target" into the function being assigned — there's no call-context to read a name from. Stack-trace-based tricks exist, but they're unreliable (broken by minification, inconsistent across engines) and expensive to run per component. The only way to solve this properly is a build-time plugin (Babel/SWC) that rewrites the call site — a real option, but one that's rarely worth adopting for a single project.
+To retrieve useful data from these attributes for components, you must explicitly pass the `displayName` property.
 
-This is the trade-off: **you're expected to set `displayName` by hand** on anything you want to recognize in React DevTools, error messages, or the `data-origin-component`/`data-resolved-component` attributes above:
+---
+
+### Component naming (`displayName`)
+
+Technically, there is no way to determine the name of the variable to which the `createComponent` factory call is assigned. Therefore, when using the factory for full debugging, **you must always pass the displayName property**. This is a well-known trade-off that we have to accept.
 
 ```tsx
 const Box = createComponent()({ ... });
+
 Box.displayName = "Box";
 ```
 
-If you skip this, the factory still assigns a fallback `displayName` automatically, derived from the resolved default `element`:
+However, the factory tries to work around this issue, and if you don't explicitly pass a `displayName`, it will resolve the name based on which element is used as the root:
 
-- For intrinsic (string) elements, the tag is capitalized and prefixed with `Factory` — `"div"` becomes `"FactoryDiv"`, `"span"` becomes `"FactorySpan"`, and so on.
+- For intrinsic elements: `Factory<Element>`, (e.g. `FactoryDiv`, `FactorySpan`)
 - For component elements (when `element` is itself a component), it uses that component's own `displayName`, falling back to its `.name`, and finally to `"FactoryUnknownComponent"` if neither is available.
-
-This fallback is also what powers `data-resolved-component` when a polymorphic `component` prop is supplied without an explicit name attached to it (e.g. `<Heading component="a" />` resolving to `FactoryA`, as shown in the [Polymorphism](#polymorphism-component-prop) example).
 
 ## API
 
