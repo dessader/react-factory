@@ -26,6 +26,10 @@ Working across projects of very different scales, I kept running into the same h
 
 React Forge grew out of that recurring friction. The goal was a single tool that encapsulates all of that logic, so you can just build components that support all of it out of the box: full type inference, polymorphism, `ref` handling, and one central abstraction you can adapt to your own needs.
 
+The idea behind a factory and how it works are fairly trivial, yet it's very effective in situations where we need maximum flexibility and predictable behavior across all components.
+
+This doesn't mean you should use it in absolutely every project, but even if you apply it in simple projects, you'll still feel its benefits — they just become much more apparent when working in large, complex design systems and big UI libraries.
+
 ## Get Started
 
 ### Installation
@@ -54,7 +58,7 @@ Text.displayName = "Text";
 
 // Usage
 <Text tone="accent" className="text-lg" />
-<Text component="span" tone="muted" />
+<Text component="span" tone="muted" className="text-sm" />
 ```
 
 > See the [Advanced](#advanced) section for a recommended pattern once you're ready to use the factory across a whole codebase.
@@ -256,11 +260,9 @@ Renders to:
 ></textarea>
 ```
 
-`ref` itself never shows up in the DOM — it's a React-only mechanism for getting a handle to the underlying node, not an HTML attribute.
-
 ### Async Server Components
 
-The function passed to `Render` can be async. This only works when it's used in a server environment (Server Components).
+The function passed to `Render` can be async.
 
 ```tsx
 import { createComponent } from "@react-forge/core";
@@ -322,7 +324,11 @@ Renders to:
 
 ### Local wrapper around the factory
 
-Importing a third-party function directly into every file that needs it is a common source of pain down the line: any shared change, or a breaking change in the package itself, means touching every call site. The established pattern for external dependencies is to wrap them in a thin local facade that all of the source code references instead — a single source of truth where behavior can be adjusted, and the only place that needs to change when the package updates.
+Directly importing the factory from the package into each component of your project is a valid approach, but you may miss out on some of the fundamental benefits. A best practice when working with important dependencies that permeate the entire project is to create a thin wrapper—also known as a facade—that encapsulates interactions with the external package, and then use this facade throughout the project. This approach offers a number of advantages:
+
+- **Resilience to change**. Even if something changes in an external dependency—whether it’s breaking changes or useful new features — you can always apply them at a single “single point of truth” and thereby propagate them throughout the entire project, rather than having to undertake a large-scale refactoring of the codebase.
+
+---
 
 `createComponent` is a good candidate for exactly this treatment, and wrapping it locally is the recommended approach. Rather than importing it directly into every component file, wrap it once, and let every component in the app go through that single entry point — so app-wide defaults live in one file and can evolve without touching every call site:
 
