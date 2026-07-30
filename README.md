@@ -458,8 +458,6 @@ For example, suppose you created a `<Button />` component and, when using it, wa
 
 To retrieve useful data from these attributes for components, you must explicitly pass the `displayName` property.
 
----
-
 ### Component naming (`displayName`)
 
 Technically, there is no way to determine the name of the variable to which the `createComponent` factory call is assigned. Therefore, when using the factory for full debugging, **you must always pass the displayName property**. This is a well-known trade-off that we have to accept.
