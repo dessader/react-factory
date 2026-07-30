@@ -324,7 +324,7 @@ Renders to:
 
 ### Local wrapper around the factory
 
-Directly importing the factory from the package into each component of your project is a valid approach, but you may miss out on some of the fundamental benefits. A best practice when working with important dependencies that permeate the entire project is to create a thin wrapper—also known as a facade—that encapsulates interactions with the external package, and then use this facade throughout the project. This approach offers a number of advantages:
+Directly importing the factory from the package into each component of your project is a valid approach, but you may miss out on some of the fundamental benefits. A best practice when working with important dependencies that permeate the entire project is to create a thin wrapper — also known as a facade. That encapsulates interactions with the external package, and then use this facade throughout the project. This approach offers a number of advantages:
 
 - **Resilience to change**. Even if something changes in an external dependency, whether it’s breaking changes or useful new features — you can always apply them at a single “single point of truth” and thereby propagate them throughout the entire project, rather than having to undertake a large-scale refactoring of the codebase.
 - **Unified Abstraction**. The Factory pattern involves creating a set of entities, and if you import the factory directly from a package, you lose full control and are forced to make the necessary configuration changes on a case-by-case basis.
