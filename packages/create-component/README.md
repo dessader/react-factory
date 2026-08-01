@@ -1,4 +1,4 @@
-<img src="../../.github/assets/cover.png" alt="React Factory" width="100%" />
+<img src="../../.github/assets/create-component.png" alt="React Factory" width="100%" />
 
 # React Factory
 
