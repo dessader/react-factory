@@ -2,6 +2,11 @@
   "name": "@react-forge/core",
   "version": "0.0.1",
   "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/dessader/react-forge.git",
+    "directory": "packages/core"
+  },
   "main": "./dist/index.js",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
