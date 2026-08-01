@@ -3,7 +3,7 @@ import { createComponent } from "../create-component.factory";
 
 import type { ReactNode } from "react";
 
-describe("createComponent — composition of factory components", () => {
+describe("createComponent: composition of factory components", () => {
   /**
    * When one factory component swaps to another via `component`, the
    * final DOM node should carry both identities: who was originally
@@ -32,8 +32,8 @@ describe("createComponent — composition of factory components", () => {
   /**
    * Exercises a chain of two independent, dynamic polymorphic swaps
    * (Outer -> Bridge -> Middle -> Innermost). Origin must stay pinned to
-   * the very first caller across the whole chain, while resolved must
-   * track the most recent activation rather than an intermediate step.
+   * the first caller across the whole chain, while resolved must track
+   * the most recent activation rather than an intermediate step.
    */
   it("keeps the origin fixed at the first activation while resolved reflects the most recent dynamic swap", () => {
     const Innermost = createComponent()({
@@ -73,8 +73,8 @@ describe("createComponent — composition of factory components", () => {
   /**
    * Composition relies on an intermediate `Render` spreading unknown
    * props through to the host element. This confirms that when it
-   * doesn't, the chain degrades gracefully to the inner component's own
-   * identity instead of crashing or silently mis-tagging the DOM node.
+   * doesn't, the chain falls back to the inner component's own identity
+   * instead of crashing or silently mis-tagging the DOM node.
    */
   it("cannot propagate origin/resolved through a composed component whose Render drops unknown props", () => {
     const Inner = createComponent<{ label: string }>()({

@@ -1,15 +1,14 @@
 import type { ComponentPropsWithRef, ElementType, ReactNode } from "react";
 
 /**
- * The final props a factory component's `Render` function receives.
+ * The final props a factory component `Render` function receives.
  *
- * Combines the factory's own custom props (`TCustomProps`) with the
- * resolved element's native props, after the polymorphic `component` prop
- * has been stripped out and after any keys shared with `TCustomProps` have
- * been removed from the native side (so custom props always win).
+ * Combines `TCustomProps` with the resolved element's native props, excluded
+ * `component` and any keys `TCustomProps` already defines (custom props
+ * win on name conflicts).
  *
  * @typeParam TElement - The intrinsic tag or component being rendered.
- * @typeParam TCustomProps - The factory's own custom prop shape.
+ * @typeParam TCustomProps - The factory own custom prop shape.
  */
 export type CreateComponentFactoryResolvedComponentProps<
   TElement extends ElementType,
@@ -20,11 +19,10 @@ export type CreateComponentFactoryResolvedComponentProps<
 /**
  * The render function supplied to `createComponent` as `Render`.
  *
- * Receives the resolved element (the intrinsic tag or component that
- * should actually be rendered — accounting for any polymorphic swap) and
- * the cleaned-up props, and produces the resulting React output. May
- * return a plain `ReactNode` synchronously, or a `Promise<ReactNode>` for
- * async Server Components.
+ * Receives the resolved element (the intrinsic tag or component to render,
+ * accounting for any polymorphic swap) and the cleaned-up props, then
+ * produces the React output. Can return a plain `ReactNode`, or a
+ * `Promise<ReactNode>` for async Server Components.
  *
  * @typeParam TElement - The intrinsic tag or component being rendered.
  * @typeParam TCustomProps - The factory's own custom prop shape.
@@ -82,8 +80,8 @@ export type CreateComponentFactoryOptions<
    */
   polymorphic?: boolean;
   /**
-   * Produces the actual React output for the resolved element and props.
-   * See {@link CreateComponentFactoryRenderFunction}.
+   * Produces the React output for the resolved element and props. See
+   * {@link CreateComponentFactoryRenderFunction}.
    */
   Render: CreateComponentFactoryRenderFunction<TElement, TCustomProps>;
 };
@@ -92,12 +90,12 @@ export type CreateComponentFactoryOptions<
  * The props accepted by the component produced by the factory.
  *
  * When `TPolymorphic` is `true` (the default), an optional `component`
- * prop is included, letting callers swap the rendered element for a
- * different intrinsic tag or component at call time.
+ * prop lets callers swap the rendered element for a different intrinsic
+ * tag or component at call time.
  *
- * @typeParam TAs - The intrinsic tag or component actually being rendered
- * for this particular usage (may differ from the factory's default
- * `element` when polymorphism is exercised).
+ * @typeParam TAs - The intrinsic tag or component being rendered for this
+ * usage (may differ from the factory's default `element` when polymorphism
+ * is exercised).
  * @typeParam TCustomProps - The factory's own custom prop shape.
  * @typeParam TPolymorphic - Whether the `component` swap prop is included.
  */

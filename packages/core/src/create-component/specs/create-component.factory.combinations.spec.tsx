@@ -2,13 +2,13 @@ import { render, screen } from "@testing-library/react";
 import { createElement } from "react";
 import { createComponent } from "../create-component.factory";
 
-describe("createComponent — cross-combinations", () => {
+describe("createComponent: cross-combinations", () => {
   /**
    * `memo` and polymorphic composition are independent features that must
    * not interfere with each other: displayName, origin/resolved tagging,
-   * and the actual re-render skip must all be correct at the same time.
+   * and the re-render skip must all be correct at the same time.
    */
-  it("memo and polymorphic composition work together: correct displayName and data-resolved-component simultaneously", () => {
+  it("combines memo and polymorphism without breaking displayName or data-resolved-component", () => {
     const Inner = createComponent()({
       Render: (Component, props) => <Component {...props} />,
     });
@@ -40,9 +40,9 @@ describe("createComponent — cross-combinations", () => {
   });
 
   /**
-   * A custom compare function must keep working normally even when the
-   * component it's attached to has polymorphism turned off — the two
-   * options operate on independent parts of the factory.
+   * A custom compare function must keep working even when the component
+   * it's attached to has polymorphism turned off. The two options operate
+   * on independent parts of the factory.
    */
   it("keeps a custom compare function working when polymorphic is disabled", () => {
     const renderSpy = vi.fn();
@@ -73,7 +73,7 @@ describe("createComponent — cross-combinations", () => {
 
   /**
    * When `element` is a component reference and polymorphism is never
-   * exercised, `Render` must receive that exact same reference — not a
+   * exercised, `Render` must receive that exact same reference, not a
    * stringified or otherwise transformed version of it.
    */
   it("resolves to the exact original component reference (not stringified) when element is a component and no component prop swaps it", () => {
@@ -95,9 +95,9 @@ describe("createComponent — cross-combinations", () => {
   /**
    * `memo` wrapping must not interfere with an async `Render`: the
    * underlying render logic (reached via `.type`, since the memo wrapper
-   * object itself isn't callable) should still return a Promise normally.
+   * object itself isn't callable) should still return a Promise.
    */
-  it("memo wrapping coexists with an async Render without conflict", async () => {
+  it("still returns a Promise from an async Render when wrapped in memo", async () => {
     const MemoAsync = createComponent<{ counter: number }>()({
       element: "p",
       memo: true,
@@ -121,11 +121,11 @@ describe("createComponent — cross-combinations", () => {
   });
 
   /**
-   * The origin/resolved composition mechanism must work correctly using
-   * purely auto-derived names too, not only when every component in the
-   * chain has an explicit displayName override.
+   * The origin/resolved composition mechanism must work with auto-derived
+   * names too, not only when every component in the chain has an explicit
+   * displayName override.
    */
-  it("uses auto-derived displayNames, not just explicit overrides, correctly during composition", () => {
+  it("tags composition using auto-derived displayNames, not just explicit ones", () => {
     const Inner = createComponent()({
       element: "span",
       Render: (Component, props) => <Component {...props} />,

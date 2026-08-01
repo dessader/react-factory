@@ -54,9 +54,9 @@ describe("getComponentDisplayName", () => {
 
   /**
    * When a component has neither `displayName` nor a usable `.name`
-   * (forced empty here to simulate a truly anonymous function), the
-   * utility must fall back to a generic placeholder instead of throwing
-   * or returning an empty string.
+   * (forced empty here to simulate an anonymous function), the utility
+   * must fall back to a generic placeholder instead of throwing or
+   * returning an empty string.
    */
   it("falls back to FactoryUnknownComponent when neither displayName nor name is set", () => {
     const Component = () => null;

@@ -3,10 +3,10 @@ import { createComponent } from "../create-component.factory";
 
 import type { ElementType } from "react";
 
-describe("createComponent — polymorphic", () => {
+describe("createComponent: polymorphic", () => {
   /**
    * `polymorphic` defaults to `true`, so a `component` prop must be
-   * honored even without explicitly opting in — it should swap the
+   * honored even without explicitly opting in. It should swap the
    * rendered tag and record what it resolved to.
    */
   it("is polymorphic by default and honors an explicit component prop", () => {

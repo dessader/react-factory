@@ -13,8 +13,8 @@ describe("createComponent", () => {
   });
 
   /**
-   * Invoking the curried factory with `options` should produce the actual
-   * component — a callable function, not some other kind of object.
+   * Invoking the curried factory with `options` should produce the
+   * component: a callable function, not some other kind of object.
    */
   it("returns a component function when the factory is invoked with options", () => {
     const FactoryComponent = createComponent()({
@@ -26,7 +26,7 @@ describe("createComponent", () => {
 
   /**
    * The component produced by the factory must behave like any normal
-   * React component when used with `createElement` — a valid element
+   * React component when used with `createElement`: a valid element
    * whose `type` is the component itself.
    */
   it("produces a valid React element when rendered", () => {

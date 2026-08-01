@@ -3,7 +3,7 @@ import { createComponent } from "../create-component.factory";
 
 const REACT_MEMO_TYPE = Symbol.for("react.memo");
 
-describe("createComponent — memo", () => {
+describe("createComponent: memo", () => {
   /**
    * Without `memo`, the returned component must be a plain function
    * component, not a `React.memo`-wrapped exotic component.
@@ -53,7 +53,7 @@ describe("createComponent — memo", () => {
 
   /**
    * Without memoization, a component must re-run its `Render` on every
-   * parent re-render, even when its own props are unchanged — this is the
+   * parent re-render, even when its own props are unchanged. This is the
    * baseline behavior the other memo tests are contrasted against.
    */
   it("re-renders on every parent re-render when memo is not set", () => {
@@ -75,9 +75,9 @@ describe("createComponent — memo", () => {
   });
 
   /**
-   * Proves a custom compare function actually changes reconciliation
-   * behavior at runtime: when it reports props as equal despite `counter`
-   * changing, `Render` must not run again and the DOM stays stale.
+   * Proves a custom compare function changes reconciliation behavior at
+   * runtime: when it reports props as equal despite `counter` changing,
+   * `Render` must not run again and the DOM stays stale.
    */
   it("skips re-render when the custom compare function ignores the changed prop", () => {
     const renderSpy = vi.fn();

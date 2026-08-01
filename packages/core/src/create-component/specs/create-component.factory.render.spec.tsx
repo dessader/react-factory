@@ -132,9 +132,9 @@ describe("createComponent (DOM rendering)", () => {
   });
 });
 
-describe("createComponent — Render return value handling", () => {
+describe("createComponent: Render return value handling", () => {
   /**
-   * `Render` isn't limited to returning host elements — a composite
+   * `Render` isn't limited to returning host elements. A composite
    * (component) element must be tagged the same way a plain host element
    * would be.
    */
@@ -165,7 +165,7 @@ describe("createComponent — Render return value handling", () => {
 
   /**
    * When `Render` returns a plain string, there is no element to attach
-   * data attributes to — it must come through untouched, with no wrapper
+   * data attributes to. It must come through untouched, with no wrapper
    * element introduced around it.
    */
   it("returns a string as-is, without a wrapper or data attributes", () => {
@@ -195,7 +195,7 @@ describe("createComponent — Render return value handling", () => {
   });
 
   /**
-   * Same guarantee as the `null` case, but for `undefined` — both are
+   * Same guarantee as the `null` case, but for `undefined`. Both are
    * valid "render nothing" signals in React.
    */
   it("returns undefined without throwing and without rendering anything", () => {
@@ -228,8 +228,8 @@ describe("createComponent — Render return value handling", () => {
 
   /**
    * A Fragment is a valid React element but doesn't correspond to any
-   * real DOM node, so the injected data attributes have nowhere to land —
-   * the children must still render correctly regardless.
+   * real DOM node, so the injected data attributes have nowhere to land.
+   * The children must still render regardless.
    */
   it("returns a Fragment; its children render, but no DOM node carries the data attributes", () => {
     const consoleErrorSpy = vi
@@ -279,10 +279,10 @@ describe("createComponent — Render return value handling", () => {
   /**
    * `Render` may return a Promise (for async Server Components support).
    * Plain client rendering (react-dom/client, which @testing-library/react
-   * uses) does not support components that return a Promise directly —
-   * that's exclusively a Server Components/RSC capability — so this
-   * branch is exercised via a direct function call instead of render(),
-   * confirming the resolved element still gets tagged correctly.
+   * uses) does not support components that return a Promise directly;
+   * that's a Server Components/RSC-only capability. So this branch is
+   * exercised via a direct function call instead of render(), confirming
+   * the resolved element still gets tagged.
    */
   it("resolves a Promise<ReactNode> and tags the resolved valid element", async () => {
     const AsyncGreeting = createComponent()({

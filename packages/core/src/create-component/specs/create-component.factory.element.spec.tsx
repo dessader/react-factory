@@ -4,9 +4,9 @@ import { createComponent } from "../create-component.factory";
 
 import type { ReactNode, Ref } from "react";
 
-describe("createComponent — element & displayName resolution", () => {
+describe("createComponent: element & displayName resolution", () => {
   /**
-   * When `element` is omitted entirely, the factory must fall back to a
+   * When `element` is omitted entirely, the factory must fallback to a
    * plain "div" and derive its displayName from that default.
    */
   it("defaults to a div when element is not provided", () => {
@@ -22,9 +22,9 @@ describe("createComponent — element & displayName resolution", () => {
   });
 
   /**
-   * Verifies that an explicit intrinsic tag (a string other than the
-   * default "div") is actually rendered, and that the auto-derived name
-   * reflects the given tag rather than the default.
+   * An explicit intrinsic tag (a string other than the default "div")
+   * renders as given, and the auto-derived name reflects that tag rather
+   * than the default.
    */
   it("renders the given intrinsic tag", () => {
     const Button = createComponent()({
@@ -39,7 +39,7 @@ describe("createComponent — element & displayName resolution", () => {
   });
 
   /**
-   * `element` isn't limited to intrinsic tags — a custom component must be
+   * `element` isn't limited to intrinsic tags. A custom component must be
    * forwarded to `Render` untouched, and the factory's auto-naming should
    * reuse that component's own displayName instead of a generic fallback.
    */
@@ -63,8 +63,8 @@ describe("createComponent — element & displayName resolution", () => {
   /**
    * This library only targets React 19+, where `ref` is accepted as a
    * plain prop on function components (forwardRef is not part of the
-   * supported API). This confirms a `ref` passed through the factory
-   * still reaches the underlying host node correctly.
+   * supported API). Confirms a `ref` passed through the factory still
+   * reaches the underlying host node.
    */
   it("forwards refs when element accepts ref as a plain prop (React 19)", () => {
     const Inner = ({
@@ -93,7 +93,7 @@ describe("createComponent — element & displayName resolution", () => {
 
   /**
    * A component element with no displayName and a forcibly empty `.name`
-   * (simulating a truly anonymous function) must still resolve to a safe,
+   * (simulating an anonymous function) must still resolve to a safe,
    * generic placeholder name instead of `undefined` or a crash.
    */
   it("falls back to FactoryUnknownComponent when the element has neither displayName nor a usable name", () => {
