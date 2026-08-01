@@ -1,4 +1,4 @@
-<img src=".github/assets/cover.png" alt="React Forge" width="100%" />
+<img src="https://raw.githubusercontent.com/dessader/react-forge/main/.github/assets/cover.png" alt="React Forge" width="100%" />
 
 # React Forge
 
