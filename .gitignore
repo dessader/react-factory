@@ -38,3 +38,6 @@ npm-debug.log
 # OS
 .DS_Store
 Thumbs.db
+
+# Copied at publish time (prepublishOnly)
+packages/*/README.md
