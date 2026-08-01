@@ -2,6 +2,7 @@
   "name": "@react-factory/create-context",
   "version": "0.0.1",
   "type": "module",
+  "private": true,
   "repository": {
     "type": "git",
     "url": "https://github.com/dessader/react-factory.git",
