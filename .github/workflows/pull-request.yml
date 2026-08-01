@@ -21,7 +21,7 @@ jobs:
 
       - run: npm ci
 
-      - run: npx nx run @react-forge/core:lint
+      - run: npx nx run @react-factory/core:lint
 
   typecheck:
     runs-on: ubuntu-latest
@@ -35,7 +35,7 @@ jobs:
 
       - run: npm ci
 
-      - run: npx nx run @react-forge/core:typecheck
+      - run: npx nx run @react-factory/core:typecheck
 
   test:
     runs-on: ubuntu-latest
@@ -49,7 +49,7 @@ jobs:
 
       - run: npm ci
 
-      - run: npx nx run @react-forge/core:test
+      - run: npx nx run @react-factory/core:test
 
   build:
     runs-on: ubuntu-latest
@@ -63,4 +63,4 @@ jobs:
 
       - run: npm ci
 
-      - run: npx nx run @react-forge/core:build
+      - run: npx nx run @react-factory/core:build

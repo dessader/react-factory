@@ -1,4 +1,4 @@
-import { createComponent } from "@react-forge/core";
+import { createComponent } from "@react-factory/core";
 
 type Post = {
   id: number;

@@ -1,4 +1,4 @@
-import { createComponent } from "@react-forge/core";
+import { createComponent } from "@react-factory/core";
 
 export const Card = createComponent()({
   element: "article",

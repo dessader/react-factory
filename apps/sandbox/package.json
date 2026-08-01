@@ -1,9 +1,9 @@
 {
-  "name": "@react-forge/sandbox",
+  "name": "@react-factory/sandbox",
   "version": "0.0.1",
   "private": true,
   "dependencies": {
-    "@react-forge/core": "^0.0.1",
+    "@react-factory/core": "^0.0.1",
     "next": "~16.1.6",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"

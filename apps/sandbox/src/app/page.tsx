@@ -21,7 +21,7 @@ const HomePage = () => {
 
   return (
     <main>
-      <h1>@react-forge/sandbox</h1>
+      <h1>@react-factory/sandbox</h1>
 
       <section>
         <h2>Basic factory usage</h2>

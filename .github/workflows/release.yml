@@ -23,7 +23,7 @@ jobs:
 
       - run: npm ci
 
-      - run: npx nx run @react-forge/core:lint
+      - run: npx nx run @react-factory/core:lint
 
   typecheck:
     runs-on: ubuntu-latest
@@ -37,7 +37,7 @@ jobs:
 
       - run: npm ci
 
-      - run: npx nx run @react-forge/core:typecheck
+      - run: npx nx run @react-factory/core:typecheck
 
   test:
     runs-on: ubuntu-latest
@@ -51,7 +51,7 @@ jobs:
 
       - run: npm ci
 
-      - run: npx nx run @react-forge/core:test
+      - run: npx nx run @react-factory/core:test
 
   build:
     runs-on: ubuntu-latest
@@ -65,7 +65,7 @@ jobs:
 
       - run: npm ci
 
-      - run: npx nx run @react-forge/core:build
+      - run: npx nx run @react-factory/core:build
 
   release:
     needs: [lint, typecheck, test, build]
@@ -86,7 +86,7 @@ jobs:
       - name: Create release PR or publish to npm
         uses: changesets/action@v1
         with:
-          publish: bash -c "npx nx run @react-forge/core:build && npx changeset publish"
+          publish: bash -c "npx nx run @react-factory/core:build && npx changeset publish"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

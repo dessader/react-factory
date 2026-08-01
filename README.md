@@ -1,6 +1,6 @@
-<img src="https://raw.githubusercontent.com/dessader/react-forge/main/.github/assets/cover.png" alt="React Forge" width="100%" />
+<img src="https://raw.githubusercontent.com/dessader/react-factory/main/.github/assets/cover.png" alt="React Factory" width="100%" />
 
-# React Forge
+# React Factory
 
 [Motivation](#motivation) • [Get Started](#get-started) • [Examples](#examples) • [Advanced](#advanced) • [Additional](#additional) • [API](#api) • [FAQ](#faq)
 
@@ -24,7 +24,7 @@ Working across projects of very different scales, I kept running into the same h
 - **No `ref` forwarding to the root node.** This used to mean wrapping every component in `forwardRef`, which was already a chore. React 19 dropped that requirement, but the underlying problem didn't go away: most components still don't forward `ref` by default, which blocks integration with any third-party library that needs direct DOM access.
 - **No flexible way to swap the root element.** This is often needed to keep markup semantically correct, and sometimes for trickier cases too. The most common example: using a button's visual styling while actually rendering it as a link.
 
-React Forge grew out of that recurring friction. The goal was a single tool that encapsulates all of that logic, so you can just build components that support all of it out of the box: full type inference, polymorphism, `ref` handling, and one central abstraction you can adapt to your own needs.
+React Factory grew out of that recurring friction. The goal was a single tool that encapsulates all of that logic, so you can just build components that support all of it out of the box: full type inference, polymorphism, `ref` handling, and one central abstraction you can adapt to your own needs.
 
 The idea behind a factory and how it works are fairly trivial, yet it's very effective in situations where we need maximum flexibility and predictable behavior across all components.
 
@@ -35,13 +35,13 @@ This doesn't mean you should use it in absolutely every project, but even if you
 ### Installation
 
 ```bash
-npm install @react-forge/core
+npm install @react-factory/core
 ```
 
 ### Usage
 
 ```tsx
-import { createComponent } from "@react-forge/core";
+import { createComponent } from "@react-factory/core";
 
 type TextProps = {
   tone: string;
@@ -68,7 +68,7 @@ Text.displayName = "Text";
 ### Custom root element (`element`)
 
 ```tsx
-import { createComponent } from "@react-forge/core";
+import { createComponent } from "@react-factory/core";
 
 const Card = createComponent()({
   element: "article",
@@ -90,7 +90,7 @@ Renders to:
 ### Custom props (`Render`)
 
 ```tsx
-import { createComponent } from "@react-forge/core";
+import { createComponent } from "@react-factory/core";
 
 type BadgeProps = {
   count: number;
@@ -118,7 +118,7 @@ Renders to:
 ### Polymorphism (`component` prop)
 
 ```tsx
-import { createComponent } from "@react-forge/core";
+import { createComponent } from "@react-factory/core";
 
 const Heading = createComponent()({
   element: "h2",
@@ -156,7 +156,7 @@ Renders to:
 ### Disabling polymorphism (`polymorphic`)
 
 ```tsx
-import { createComponent } from "@react-forge/core";
+import { createComponent } from "@react-factory/core";
 
 const Form = createComponent()({
   element: "form",
@@ -184,7 +184,7 @@ Renders to:
 ### Memoization (`memo`)
 
 ```tsx
-import { createComponent } from "@react-forge/core";
+import { createComponent } from "@react-factory/core";
 
 type AvatarProps = {
   src: string;
@@ -233,7 +233,7 @@ Renders to:
 
 ```tsx
 import { useRef } from "react";
-import { createComponent } from "@react-forge/core";
+import { createComponent } from "@react-factory/core";
 
 const Input = createComponent()({
   element: "input",
@@ -265,7 +265,7 @@ Renders to:
 The function passed to `Render` can be async.
 
 ```tsx
-import { createComponent } from "@react-forge/core";
+import { createComponent } from "@react-factory/core";
 
 type Post = {
   id: number;
@@ -338,9 +338,9 @@ The simplest option is to simply create a wrapper around the factory and use tha
 ```tsx
 // lib/create-component.ts
 
-import { createComponent as createComponentFactory } from "@react-forge/core";
+import { createComponent as createComponentFactory } from "@react-factory/core";
 
-import type { CreateComponentFactoryOptions } from "@react-forge/core";
+import type { CreateComponentFactoryOptions } from "@react-factory/core";
 import type { ElementType } from "react";
 
 export const createComponent = <

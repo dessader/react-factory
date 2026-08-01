@@ -1,10 +1,10 @@
 {
-  "name": "@react-forge/core",
+  "name": "@react-factory/core",
   "version": "0.0.1",
   "type": "module",
   "repository": {
     "type": "git",
-    "url": "https://github.com/dessader/react-forge.git",
+    "url": "https://github.com/dessader/react-factory.git",
     "directory": "packages/core"
   },
   "main": "./dist/index.js",
