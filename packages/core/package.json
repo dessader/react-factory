@@ -22,6 +22,9 @@
     "dist",
     "!**/*.tsbuildinfo"
   ],
+  "scripts": {
+    "prepublishOnly": "node -e \"require('fs').copyFileSync('../../README.md','README.md')\""
+  },
   "dependencies": {},
   "devDependencies": {
     "@testing-library/jest-dom": "^7.0.0",
