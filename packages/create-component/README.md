@@ -1,4 +1,4 @@
-<img src="https://raw.githubusercontent.com/dessader/react-factory/main/.github/assets/cover.png" alt="React Factory" width="100%" />
+<img src="../../.github/assets/cover.png" alt="React Factory" width="100%" />
 
 # React Factory
 
@@ -35,13 +35,13 @@ This doesn't mean you should use it in absolutely every project, but even if you
 ### Installation
 
 ```bash
-npm install @react-factory/core
+npm install @react-factory/create-component
 ```
 
 ### Usage
 
 ```tsx
-import { createComponent } from "@react-factory/core";
+import { createComponent } from "@react-factory/create-component";
 
 type TextProps = {
   tone: string;
@@ -68,7 +68,7 @@ Text.displayName = "Text";
 ### Custom root element (`element`)
 
 ```tsx
-import { createComponent } from "@react-factory/core";
+import { createComponent } from "@react-factory/create-component";
 
 const Card = createComponent()({
   element: "article",
@@ -90,7 +90,7 @@ Renders to:
 ### Custom props (`Render`)
 
 ```tsx
-import { createComponent } from "@react-factory/core";
+import { createComponent } from "@react-factory/create-component";
 
 type BadgeProps = {
   count: number;
@@ -118,7 +118,7 @@ Renders to:
 ### Polymorphism (`component` prop)
 
 ```tsx
-import { createComponent } from "@react-factory/core";
+import { createComponent } from "@react-factory/create-component";
 
 const Heading = createComponent()({
   element: "h2",
@@ -156,7 +156,7 @@ Renders to:
 ### Disabling polymorphism (`polymorphic`)
 
 ```tsx
-import { createComponent } from "@react-factory/core";
+import { createComponent } from "@react-factory/create-component";
 
 const Form = createComponent()({
   element: "form",
@@ -184,7 +184,7 @@ Renders to:
 ### Memoization (`memo`)
 
 ```tsx
-import { createComponent } from "@react-factory/core";
+import { createComponent } from "@react-factory/create-component";
 
 type AvatarProps = {
   src: string;
@@ -233,7 +233,7 @@ Renders to:
 
 ```tsx
 import { useRef } from "react";
-import { createComponent } from "@react-factory/core";
+import { createComponent } from "@react-factory/create-component";
 
 const Input = createComponent()({
   element: "input",
@@ -265,7 +265,7 @@ Renders to:
 The function passed to `Render` can be async.
 
 ```tsx
-import { createComponent } from "@react-factory/core";
+import { createComponent } from "@react-factory/create-component";
 
 type Post = {
   id: number;
@@ -338,9 +338,9 @@ The simplest option is to simply create a wrapper around the factory and use tha
 ```tsx
 // lib/create-component.ts
 
-import { createComponent as createComponentFactory } from "@react-factory/core";
+import { createComponent as createComponentFactory } from "@react-factory/create-component";
 
-import type { CreateComponentFactoryOptions } from "@react-factory/core";
+import type { CreateComponentFactoryOptions } from "@react-factory/create-component";
 import type { ElementType } from "react";
 
 export const createComponent = <

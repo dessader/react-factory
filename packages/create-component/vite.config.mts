@@ -5,7 +5,7 @@ import * as path from "path";
 
 export default defineConfig(() => ({
   root: import.meta.dirname,
-  cacheDir: "../../node_modules/.vite/packages/core",
+  cacheDir: "../../node_modules/.vite/packages/create-component",
   plugins: [
     dts({
       entryRoot: "src",
@@ -28,7 +28,7 @@ export default defineConfig(() => ({
     lib: {
       // Could also be a dictionary or array of multiple entry points.
       entry: "src/index.ts",
-      name: "@react-factory/core",
+      name: "@react-factory/create-component",
       fileName: "index",
       // Change this to the formats you want to support.
       // Don't forget to update your package.json as well.
@@ -40,7 +40,7 @@ export default defineConfig(() => ({
     },
   },
   test: {
-    name: "@react-factory/core",
+    name: "@react-factory/create-component",
     watch: false,
     globals: true,
     environment: "jsdom",

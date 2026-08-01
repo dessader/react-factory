@@ -1,5 +1,5 @@
 import { memo as reactMemo, cloneElement, isValidElement } from "react";
-import { getComponentDisplayName } from "../utils";
+import { getComponentDisplayName } from "./utils";
 
 import type {
   CreateComponentFactoryOptions,

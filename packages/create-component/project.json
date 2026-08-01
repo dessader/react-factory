@@ -8,7 +8,7 @@
           "vitest run --coverage",
           "npx serve -l 4100 test-output/vitest/coverage"
         ],
-        "cwd": "packages/core",
+        "cwd": "packages/create-component",
         "parallel": false
       }
     }

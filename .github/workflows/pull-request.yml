@@ -21,7 +21,7 @@ jobs:
 
       - run: npm ci
 
-      - run: npx nx run @react-factory/core:lint
+      - run: npx nx run @react-factory/create-component:lint
 
   typecheck:
     runs-on: ubuntu-latest
@@ -35,7 +35,7 @@ jobs:
 
       - run: npm ci
 
-      - run: npx nx run @react-factory/core:typecheck
+      - run: npx nx run @react-factory/create-component:typecheck
 
   test:
     runs-on: ubuntu-latest
@@ -49,7 +49,7 @@ jobs:
 
       - run: npm ci
 
-      - run: npx nx run @react-factory/core:test
+      - run: npx nx run @react-factory/create-component:test
 
   build:
     runs-on: ubuntu-latest
@@ -63,4 +63,4 @@ jobs:
 
       - run: npm ci
 
-      - run: npx nx run @react-factory/core:build
+      - run: npx nx run @react-factory/create-component:build

@@ -1,4 +1,4 @@
-import { getComponentDisplayName } from "../get-component-display-name";
+import { getComponentDisplayName } from "../utils/get-component-display-name";
 
 import type { ElementType } from "react";
 

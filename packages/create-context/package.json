@@ -1,11 +1,11 @@
 {
-  "name": "@react-factory/core",
+  "name": "@react-factory/create-context",
   "version": "0.0.1",
   "type": "module",
   "repository": {
     "type": "git",
     "url": "https://github.com/dessader/react-factory.git",
-    "directory": "packages/core"
+    "directory": "packages/create-context"
   },
   "main": "./dist/index.js",
   "module": "./dist/index.js",
@@ -22,16 +22,10 @@
     "dist",
     "!**/*.tsbuildinfo"
   ],
-  "scripts": {
-    "prepublishOnly": "node -e \"require('fs').copyFileSync('../../README.md','README.md')\""
-  },
   "dependencies": {},
   "devDependencies": {
     "@testing-library/jest-dom": "^7.0.0",
     "@testing-library/react": "^16.3.2",
     "@testing-library/user-event": "^14.6.1"
-  },
-  "peerDependencies": {
-    "react": "^19.0.0"
   }
 }

@@ -1,6 +1,6 @@
-import { createComponent as createComponentFactory } from "@react-factory/core";
+import { createComponent as createComponentFactory } from "@react-factory/create-component";
 
-import type { CreateComponentFactoryOptions } from "@react-factory/core";
+import type { CreateComponentFactoryOptions } from "@react-factory/create-component";
 import type { ElementType } from "react";
 
 export const createComponent = <
