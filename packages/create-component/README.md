@@ -1,6 +1,6 @@
 <img src="../../.github/assets/create-component.png" alt="React Factory" width="100%" />
 
-# React Forge – Create Component
+# React Factory – Create Component
 
 [Motivation](#motivation) • [Get Started](#get-started) • [Examples](#examples) • [Advanced](#advanced) • [Additional](#additional) • [API](#api) • [FAQ](#faq)
 
