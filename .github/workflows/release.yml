@@ -12,64 +12,23 @@ permissions:
   pull-requests: write
 
 jobs:
-  lint:
+  verify:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
-
       - uses: actions/setup-node@v5
         with:
           node-version: 24
           cache: npm
 
       - run: npm ci
-
       - run: npx nx run @react-factory/create-component:lint
-
-  typecheck:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v5
-
-      - uses: actions/setup-node@v5
-        with:
-          node-version: 24
-          cache: npm
-
-      - run: npm ci
-
       - run: npx nx run @react-factory/create-component:typecheck
-
-  test:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v5
-
-      - uses: actions/setup-node@v5
-        with:
-          node-version: 24
-          cache: npm
-
-      - run: npm ci
-
       - run: npx nx run @react-factory/create-component:test
-
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v5
-
-      - uses: actions/setup-node@v5
-        with:
-          node-version: 24
-          cache: npm
-
-      - run: npm ci
-
       - run: npx nx run @react-factory/create-component:build
 
   release:
-    needs: [lint, typecheck, test, build]
+    needs: verify
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
