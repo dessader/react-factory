@@ -1,6 +1,6 @@
 <img src=".github/assets/main.png" alt="React Factory" width="100%" />
 
-# React Factory
+# Introduction
 
 A set of lightweight, specialized utilities that standardize recurring front-end development patterns. Each package targets one such pattern and turns it into a single, typed, reusable primitive: less duplicated logic, more consistent behavior across a codebase.
 
