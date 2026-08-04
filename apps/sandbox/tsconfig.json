@@ -50,6 +50,9 @@
   "references": [
     {
       "path": "../../packages/create-component"
+    },
+    {
+      "path": "../../packages/create-context"
     }
   ]
 }
