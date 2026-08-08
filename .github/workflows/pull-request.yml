@@ -19,7 +19,5 @@ jobs:
           cache: npm
 
       - run: npm ci
-      - run: npx nx run @react-factory/create-component:lint
-      - run: npx nx run @react-factory/create-component:typecheck
-      - run: npx nx run @react-factory/create-component:test
-      - run: npx nx run @react-factory/create-component:build
+      - run: npx nx run-many -t lint typecheck test build -p 'packages/*'
+      - run: npx nx run @react-factory/sandbox:build
