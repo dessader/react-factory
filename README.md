@@ -15,4 +15,4 @@ The scope stays narrow on purpose. The main goal is to create tools that help ad
 ## Packages
 
 - **[`@react-factory/create-component`](./packages/create-component)** – a factory for building React components.
-- **[`@react-factory/create-context`](./packages/create-context)** – a factory for creating React context. **Work in progress**.
+- **[`@react-factory/create-context`](./packages/create-context)** – a factory for creating React context.
