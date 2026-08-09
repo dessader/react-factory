@@ -2,6 +2,11 @@
 
 # 📦 @react-factory/create-context
 
+[![npm version](https://img.shields.io/npm/v/@react-factory/create-context.svg)](https://www.npmjs.com/package/@react-factory/create-context)
+[![npm downloads](https://img.shields.io/npm/dm/@react-factory/create-context.svg)](https://www.npmjs.com/package/@react-factory/create-context)
+[![bundle size](https://img.shields.io/bundlephobia/minzip/@react-factory/create-context)](https://bundlephobia.com/package/@react-factory/create-context)
+[![license](https://img.shields.io/npm/l/@react-factory/create-context.svg)](../../LICENSE)
+
 [Motivation](#motivation) • [Get Started](#get-started) • [Examples](#examples) • [API](#api)
 
 A tiny factory for creating a React context and providing convenient access to it.
