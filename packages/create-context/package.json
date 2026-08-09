@@ -1,6 +1,8 @@
 {
   "name": "@react-factory/create-context",
   "version": "0.0.1",
+  "description": "A tiny factory for creating a React context and providing convenient access to it.",
+  "license": "MIT",
   "type": "module",
   "repository": {
     "type": "git",
