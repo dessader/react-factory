@@ -2,6 +2,11 @@
 
 # 📦 @react-factory/create-component
 
+[![npm version](https://img.shields.io/npm/v/@react-factory/create-component.svg)](https://www.npmjs.com/package/@react-factory/create-component)
+[![npm downloads](https://img.shields.io/npm/dm/@react-factory/create-component.svg)](https://www.npmjs.com/package/@react-factory/create-component)
+[![bundle size](https://img.shields.io/bundlephobia/minzip/@react-factory/create-component)](https://bundlephobia.com/package/@react-factory/create-component)
+[![license](https://img.shields.io/npm/l/@react-factory/create-component.svg)](../../LICENSE)
+
 [Motivation](#motivation) • [Get Started](#get-started) • [Examples](#examples) • [Advanced](#advanced) • [Additional](#additional) • [API](#api) • [FAQ](#faq)
 
 A lightweight factory for building type-safe, polymorphic React components.
@@ -322,46 +327,24 @@ Renders to:
 
 ## Advanced
 
-### Local wrapper around the factory
-
 Directly importing the factory from the package into each component of your project is a valid approach, but you may miss out on some of the fundamental benefits. A best practice when working with important dependencies that permeate the entire project is to create a thin wrapper — also known as a facade. That encapsulates interactions with the external package, and then use this facade throughout the project. This approach offers a number of advantages:
 
 - **Resilience to change**. Even if something changes in an external dependency, whether it’s breaking changes or useful new features — you can always apply them at a single “single point of truth” and thereby propagate them throughout the entire project, rather than having to undertake a large-scale refactoring of the codebase.
 - **Unified Abstraction**. The Factory pattern involves creating a set of entities, and if you import the factory directly from a package, you lose full control and are forced to make the necessary configuration changes on a case-by-case basis.
 
-The `createComponent` factory is good on its own, but if you build a thin facade around it, you'll further ensure the code base's resilience to changes and gain even more flexibility and capabilities.
+React Factory ships `defineCreateComponent` for exactly this: pass it project-wide defaults for any of the factory's options, and it hands back a local factory with the exact same shape as `createComponent`, pre-filled with those defaults. Every component created through it can still override any of them individually. That covers most projects out of the box; for anything more custom, you're free to write your own instantiation function on top of the factory and shape it however your project needs, in as many variations as you like.
 
-#### Basic Usage
+### Basic Usage
 
-The simplest option is to simply create a wrapper around the factory and use that wrapper to create components. If at any point you want to change any settings, you only have to do it once:
+Call `defineCreateComponent` once, export the result, and use it everywhere instead of the raw `createComponent`:
 
 ```tsx
 // lib/create-component.ts
 
-import { createComponent as createComponentFactory } from "@react-factory/create-component";
+import { defineCreateComponent } from "@react-factory/create-component";
 
-import type { CreateComponentFactoryOptions } from "@react-factory/create-component";
-import type { ElementType } from "react";
-
-export const createComponent = <
-  TCustomProps extends Record<string, unknown> = Record<never, never>,
->() => {
-  const factory = createComponentFactory<TCustomProps>();
-
-  return <
-    TElement extends ElementType = "div",
-    TPolymorphic extends boolean = true,
-  >(
-    options: CreateComponentFactoryOptions<TElement, TCustomProps> & {
-      polymorphic?: TPolymorphic;
-    },
-  ) =>
-    factory({
-      // For example, for some reason, we want to enable memoization for all components.
-      memo: true,
-      ...options,
-    });
-};
+// For example, for some reason, we want to enable memoization for all components.
+export const createComponent = defineCreateComponent({ memo: true });
 ```
 
 ```tsx
@@ -389,43 +372,28 @@ const Unmemoized = createComponent()({
 });
 ```
 
-Every component created using this wrapper around `createComponent` uses the default memoization settings; however, the `Unmemoized` component can override this behavior locally.
+Every component created using this local factory inherits `memo: true`. `Unmemoized` opts out for itself, leaving every other component unaffected.
 
-#### Multiple factories
+### Multiple factories
 
-The idea of using wrappers around the factory can be taken even further; you can create several variants for different use cases:
+The idea of using wrappers around the factory can be taken even further; you can create several variants for different use cases, each backed by its own call to `defineCreateComponent`:
 
 - `createPolymorphicComponent` - components that explicitly support polymorphism
 - `createStrictComponent` – strict components that must always contain a single semantic element and ensure its stability (e.g., `<form />`, `<input />`)
-- `create<WhatDoYouWant>Component` – any other factory settings or custom modifications and enhancements
+- `create<WhatDoYouWant>Component` – any custom wrappers
 
 ```tsx
 // lib/create-component.ts
 
-type ComponentOptions<TElement extends ElementType, TCustomProps> = Omit<
-  CreateComponentFactoryOptions<TElement, TCustomProps>,
-  "polymorphic"
->;
+import { defineCreateComponent } from "@react-factory/create-component";
 
-export const createPolymorphicComponent = <
-  TCustomProps extends Record<string, unknown> = Record<never, never>,
->() => {
-  const factory = createComponentFactory<TCustomProps>();
+export const createPolymorphicComponent = defineCreateComponent({
+  polymorphic: true,
+});
 
-  return <TElement extends ElementType = "div">(
-    options: ComponentOptions<TElement, TCustomProps>,
-  ) => factory<TElement, true>({ ...options, polymorphic: true });
-};
-
-export const createStrictComponent = <
-  TCustomProps extends Record<string, unknown> = Record<never, never>,
->() => {
-  const factory = createComponentFactory<TCustomProps>();
-
-  return <TElement extends ElementType = "div">(
-    options: ComponentOptions<TElement, TCustomProps>,
-  ) => factory<TElement, false>({ ...options, polymorphic: false });
-};
+export const createStrictComponent = defineCreateComponent({
+  polymorphic: false,
+});
 ```
 
 ```tsx
@@ -495,6 +463,21 @@ Props accepted by the component returned from `createComponent<TCustomProps>()({
 | `component` | `ElementType`                                         | `element` from the descriptor | Swaps the rendered element for this call only. Only present when `polymorphic` is `true` (the default).               |
 | `ref`       | inferred                                              | —                             | Forwarded straight to the resolved root — typed per the actually rendered element, no `forwardRef` required.          |
 | ...         | `TCustomProps & native props of the resolved element` | —                             | Everything else: your custom props plus the resolved element's own native props (custom props win on name conflicts). |
+
+### `defineCreateComponent(defaultOptions)`
+
+Returns a local factory shaped exactly like `createComponent`
+(`localCreateComponent<TCustomProps>()({ ... })`), pre-filled with the
+defaults below. Any of them can still be overridden per component; see
+[Local wrapper around the factory](#local-wrapper-around-the-factory).
+
+| Property      | Type                                 | Default     | Description                                                                        |
+| ------------- | ------------------------------------ | ----------- | ---------------------------------------------------------------------------------- |
+| `element`     | `ElementType`                        | `"div"`     | Default host tag or component for every component from the local factory.          |
+| `memo`        | `boolean \| (prev, next) => boolean` | `undefined` | Default memoization behavior. Same semantics as `createComponent`'s `memo`.        |
+| `polymorphic` | `boolean`                            | `true`      | Default polymorphism setting. Same semantics as `createComponent`'s `polymorphic`. |
+
+`Render` isn't accepted here — it's specific to one component, so it stays required on every `localCreateComponent(...)(...)` call.
 
 ## FAQ
 

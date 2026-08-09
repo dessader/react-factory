@@ -87,6 +87,34 @@ export type CreateComponentFactoryOptions<
 };
 
 /**
+ * Defaults accepted by `defineCreateComponent`.
+ *
+ * Same shape as {@link CreateComponentFactoryOptions}, without `Render`:
+ * a `Render` function is specific to one component.
+ *
+ * `memo`, when supplied here, is typed loosely rather than against a
+ * concrete `TCustomProps`. At the point `defineCreateComponent` is called,
+ * no component's custom props shape exists yet. That's only fixed later,
+ * per component, via `localCreateComponent<TCustomProps>()`, so a
+ * comparator function set as a default is not type-checked against any
+ * particular component's props.
+ *
+ * `element` stays fully supported here, typed against `TElement` exactly
+ * like it is on {@link CreateComponentFactoryOptions}: it's the default
+ * host tag or component for every component created from the resulting
+ * local factory, unless a given component overrides it.
+ *
+ * @typeParam TElement - The default host tag or component every component
+ * created from the resulting local factory renders unless it overrides
+ * `element` itself.
+ */
+export type CreateComponentFactoryDefaultOptions<TElement extends ElementType> =
+  Omit<
+    CreateComponentFactoryOptions<TElement, Record<string, unknown>>,
+    "Render"
+  >;
+
+/**
  * The props accepted by the component produced by the factory.
  *
  * When `TPolymorphic` is `true` (the default), an optional `component`

@@ -22,6 +22,7 @@ import {
   MissingProviderDemo,
   MultipleContextsDemo,
 } from "@/components/context-examples";
+import { ToolbarButton, ToolbarLink } from "@/components/toolbar";
 
 const HomePage = () => {
   const [tick, setTick] = useState(0);
@@ -42,6 +43,8 @@ const HomePage = () => {
       <section>
         <h2>Local wrapper around the factory</h2>
         <p>
+          <code>lib/create-component.ts</code> calls{" "}
+          <code>defineCreateComponent</code> once to build this local factory.
           Clicking re-renders the parent without changing either button&apos;s
           props. <code>Button</code> is memoized (<code>memo: true</code> by
           default) and its render count stays put once mounted;{" "}
@@ -58,11 +61,34 @@ const HomePage = () => {
 
       <section>
         <h2>Multiple factories</h2>
+        <p>
+          <code>createPolymorphicComponent</code> and{" "}
+          <code>createStrictComponent</code> are two independent{" "}
+          <code>defineCreateComponent</code> calls, each with its own{" "}
+          <code>polymorphic</code> default.
+        </p>
         <div className='row'>
           <Link href='/somewhere'>Polymorphic link</Link>
           <Form action='/submit'>
             <button type='submit'>Submit</button>
           </Form>
+        </div>
+      </section>
+
+      <section>
+        <h2>
+          <code>defineCreateComponent</code>: default element
+        </h2>
+        <p>
+          <code>createToolbarComponent</code> defaults to{" "}
+          <code>element: &quot;button&quot;</code>. <code>ToolbarButton</code>{" "}
+          doesn&apos;t set <code>element</code> itself and inherits that
+          default; <code>ToolbarLink</code> overrides it with{" "}
+          <code>element: &quot;a&quot;</code>, for itself only.
+        </p>
+        <div className='row'>
+          <ToolbarButton>Inherits button</ToolbarButton>
+          <ToolbarLink href='/somewhere'>Overrides to a</ToolbarLink>
         </div>
       </section>
 

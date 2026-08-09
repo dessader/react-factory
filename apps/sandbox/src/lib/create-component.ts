@@ -1,49 +1,18 @@
-import { createComponent as createComponentFactory } from "@react-factory/create-component";
+import { defineCreateComponent } from "@react-factory/create-component";
 
-import type { CreateComponentFactoryOptions } from "@react-factory/create-component";
-import type { ElementType } from "react";
+// For example, for some reason, we want to enable memoization for all components.
+export const createComponent = defineCreateComponent({ memo: true });
 
-export const createComponent = <
-  TCustomProps extends Record<string, unknown> = Record<never, never>,
->() => {
-  const factory = createComponentFactory<TCustomProps>();
+export const createPolymorphicComponent = defineCreateComponent({
+  polymorphic: true,
+});
 
-  return <
-    TElement extends ElementType = "div",
-    TPolymorphic extends boolean = true,
-  >(
-    options: CreateComponentFactoryOptions<TElement, TCustomProps> & {
-      polymorphic?: TPolymorphic;
-    },
-  ) =>
-    factory({
-      // For example, for some reason, we want to enable memoization for all components.
-      memo: true,
-      ...options,
-    });
-};
+export const createStrictComponent = defineCreateComponent({
+  polymorphic: false,
+});
 
-type ComponentOptions<TElement extends ElementType, TCustomProps> = Omit<
-  CreateComponentFactoryOptions<TElement, TCustomProps>,
-  "polymorphic"
->;
-
-export const createPolymorphicComponent = <
-  TCustomProps extends Record<string, unknown> = Record<never, never>,
->() => {
-  const factory = createComponentFactory<TCustomProps>();
-
-  return <TElement extends ElementType = "div">(
-    options: ComponentOptions<TElement, TCustomProps>,
-  ) => factory<TElement, true>({ ...options, polymorphic: true });
-};
-
-export const createStrictComponent = <
-  TCustomProps extends Record<string, unknown> = Record<never, never>,
->() => {
-  const factory = createComponentFactory<TCustomProps>();
-
-  return <TElement extends ElementType = "div">(
-    options: ComponentOptions<TElement, TCustomProps>,
-  ) => factory<TElement, false>({ ...options, polymorphic: false });
-};
+// A local factory whose components default to rendering as a button,
+// unless a given component overrides `element` itself.
+export const createToolbarComponent = defineCreateComponent({
+  element: "button",
+});
