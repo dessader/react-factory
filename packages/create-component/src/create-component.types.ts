@@ -1,11 +1,69 @@
 import type { ComponentPropsWithRef, ElementType, ReactNode } from "react";
 
 /**
+ * Type-only key of {@link CreateComponentFactoryMeta}. Never exists at
+ * runtime.
+ */
+declare const factoryMeta: unique symbol;
+
+/**
+ * Type-only brand carried by every component the factory produces: its
+ * default `element` and its custom props shape. There is no such property
+ * at runtime.
+ *
+ * Lets {@link CreateComponentFactoryElementProps} type a factory component
+ * passed as another factory component's `component` by what it actually
+ * renders there, instead of by its generic call signature.
+ *
+ * @typeParam TElement - The factory component's default element.
+ * @typeParam TCustomProps - The factory component's custom prop shape.
+ */
+export type CreateComponentFactoryMeta<
+  TElement extends ElementType,
+  TCustomProps,
+> = {
+  readonly [factoryMeta]: {
+    element: TElement;
+    customProps: TCustomProps;
+  };
+};
+
+/**
+ * The native props of an element, as seen by a factory component that
+ * renders it.
+ *
+ * For a factory component (one carrying {@link CreateComponentFactoryMeta}),
+ * resolves to its default element's props plus its custom props: rendered
+ * as another factory component's `component`, it never receives a
+ * `component` of its own, so it always renders its default element. Reading
+ * its props from the generic call signature instead would erase the
+ * signature's type parameter to its constraint, and for an allow-list that
+ * keeps only the props common to every allowed element.
+ *
+ * For anything else, resolves to `ComponentPropsWithRef<TElement>`.
+ *
+ * @typeParam TElement - The intrinsic tag or component being rendered.
+ */
+export type CreateComponentFactoryElementProps<TElement extends ElementType> =
+  TElement extends {
+    readonly [factoryMeta]: {
+      element: infer TInnerElement extends ElementType;
+      customProps: infer TInnerCustomProps;
+    };
+  }
+    ? CreateComponentFactoryResolvedComponentProps<
+        TInnerElement,
+        TInnerCustomProps
+      >
+    : ComponentPropsWithRef<TElement>;
+
+/**
  * The final props a factory component `Render` function receives.
  *
- * Combines `TCustomProps` with the resolved element's native props, excluded
- * `component` and any keys `TCustomProps` already defines (custom props
- * win on name conflicts).
+ * Combines `TCustomProps` with the resolved element's native props (see
+ * {@link CreateComponentFactoryElementProps}), excluded `component` and
+ * any keys `TCustomProps` already defines (custom props win on name
+ * conflicts).
  *
  * @typeParam TElement - The intrinsic tag or component being rendered.
  * @typeParam TCustomProps - The factory own custom prop shape.
@@ -14,7 +72,10 @@ export type CreateComponentFactoryResolvedComponentProps<
   TElement extends ElementType,
   TCustomProps,
 > = TCustomProps &
-  Omit<ComponentPropsWithRef<TElement>, keyof TCustomProps | "component">;
+  Omit<
+    CreateComponentFactoryElementProps<TElement>,
+    keyof TCustomProps | "component"
+  >;
 
 /**
  * The render function supplied to `createComponent` as `Render`.
@@ -198,3 +259,34 @@ export type CreateComponentFactoryMemoFunction<
   prevProps: CreateComponentFactoryComponentProps<TElement, TCustomProps>,
   nextProps: CreateComponentFactoryComponentProps<TElement, TCustomProps>,
 ) => boolean;
+
+/**
+ * The component produced by `createComponent<TCustomProps>()(options)`.
+ *
+ * Generic over `TAs`, the element resolved for one usage: constrained to
+ * {@link CreateComponentFactoryAllowedElement} and defaulting to
+ * `TElement`. Carries the type-only {@link CreateComponentFactoryMeta}
+ * brand, so it is typed by its default element when passed as another
+ * factory component's `component`.
+ *
+ * @typeParam TElement - The factory component's default element.
+ * @typeParam TCustomProps - The factory component's custom prop shape.
+ * @typeParam TPolymorphic - The factory component's `polymorphic` option.
+ */
+export type CreateComponentFactoryComponent<
+  TElement extends ElementType,
+  TCustomProps,
+  TPolymorphic extends CreateComponentFactoryPolymorphicOption,
+> = {
+  <
+    TAs extends CreateComponentFactoryAllowedElement<TElement, TPolymorphic> =
+      TElement,
+  >(
+    props: CreateComponentFactoryComponentProps<
+      TAs,
+      TCustomProps,
+      TPolymorphic
+    >,
+  ): ReactNode;
+  displayName: string;
+} & CreateComponentFactoryMeta<TElement, TCustomProps>;

@@ -4,6 +4,7 @@ import { assertAllowedComponent, getComponentDisplayName } from "./utils";
 import type {
   CreateComponentFactoryAllowedElement,
   CreateComponentFactoryOptions,
+  CreateComponentFactoryComponent,
   CreateComponentFactoryComponentProps,
   CreateComponentFactoryPolymorphicOption,
   CreateComponentFactoryResolvedComponentProps,
@@ -198,8 +199,16 @@ export const createComponent = <
         configurable: true,
       });
 
-      return MemoizedFactoryComponent as typeof FactoryComponent;
+      return MemoizedFactoryComponent as unknown as CreateComponentFactoryComponent<
+        TElement,
+        TCustomProps,
+        TPolymorphic
+      >;
     }
-    return FactoryComponent;
+    return FactoryComponent as CreateComponentFactoryComponent<
+      TElement,
+      TCustomProps,
+      TPolymorphic
+    >;
   };
 };

@@ -99,4 +99,56 @@ describe("createComponent: composition of factory components", () => {
     expect(node).toHaveAttribute("data-origin-component", "Inner");
     expect(node).not.toHaveAttribute("data-resolved-component");
   });
+  /**
+   * A factory component passed as another factory component's `component`
+   * never receives a `component` of its own, so it always renders its
+   * default element. Its props must be typed by that element plus its own
+   * custom props, not by the props common to every element of its
+   * allow-list. Elements are only created, never rendered, so the
+   * `@ts-expect-error` lines are checked by the `typecheck` target alone.
+   */
+  it("types a composed factory component by its default element and custom props", () => {
+    const Icon = createComponent<{ name: string }>()({
+      element: "i",
+      polymorphic: false,
+      Render: (Component, props) => <Component {...props} />,
+    });
+
+    const Text = createComponent()({
+      element: "span",
+      polymorphic: ["strong", Icon],
+      Render: (Component, props) => <Component {...props} />,
+    });
+
+    const Labeled = createComponent<{ label: string }>()({
+      element: "a",
+      Render: (Component, props) => <Component {...props} />,
+    });
+
+    const Button = createComponent()({
+      element: "button",
+      Render: (Component, props) => <Component {...props} />,
+    });
+
+    const elements = [
+      <Button key='allow-list-children' component={Text}>
+        save
+      </Button>,
+      <Button key='inner-native' component={Labeled} label='go' href='/docs'>
+        go
+      </Button>,
+      <Button key='inner-custom' component={Icon} name='star' />,
+      // @ts-expect-error href is not a prop of Text's default span
+      <Button key='invalid-native' component={Text} href='/docs' />,
+      // @ts-expect-error label is required by Labeled
+      <Button key='missing-custom' component={Labeled} />,
+      // @ts-expect-error name is required by Icon
+      <Button key='missing-icon-name' component={Icon} />,
+    ];
+
+    expect(elements).toHaveLength(6);
+
+    render(elements[0]);
+    expect(screen.getByText("save").tagName).toBe("SPAN");
+  });
 });
