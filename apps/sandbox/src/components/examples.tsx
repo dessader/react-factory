@@ -35,6 +35,28 @@ export const StrictForm = createComponent()({
 
 StrictForm.displayName = "Form";
 
+type IconProps = {
+  name: string;
+};
+
+export const Icon = createComponent<IconProps>()({
+  element: "i",
+  polymorphic: false,
+  Render: (Component, { name, ...props }) => (
+    <Component data-icon={name} {...props} />
+  ),
+});
+
+Icon.displayName = "Icon";
+
+export const Caption = createComponent()({
+  element: "p",
+  polymorphic: ["span", "figcaption", Icon],
+  Render: (Component, props) => <Component {...props} />,
+});
+
+Caption.displayName = "Caption";
+
 type AvatarProps = {
   src: string;
 };

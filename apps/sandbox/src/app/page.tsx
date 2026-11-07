@@ -10,6 +10,8 @@ import {
   Badge,
   Heading,
   StrictForm,
+  Caption,
+  Icon,
   Avatar,
   Price,
   Input,
@@ -112,6 +114,15 @@ const HomePage = () => {
 
         <h3>Disabling polymorphism</h3>
         <StrictForm action='/submit' />
+
+        <h3>Restricting polymorphism</h3>
+        <div className='row'>
+          <Caption>Renders as a p by default</Caption>
+          <Caption component='span'>Renders as a span</Caption>
+          <Caption component={Icon} name='info' />
+          {/* Type error, and a runtime error in development: */}
+          {/* <Caption component='a' href='/docs' /> */}
+        </div>
 
         <h3>Memoization</h3>
         <div className='row'>

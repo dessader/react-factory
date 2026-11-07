@@ -120,7 +120,15 @@ Renders to:
 <span data-count="3" data-origin-component="Badge"></span>
 ```
 
-### Polymorphism (`component` prop)
+### Polymorphism (`polymorphic` and `component`)
+
+The `polymorphic` option controls whether, and to what, a component's root element can be swapped at call time through the `component` prop. It has three modes:
+
+- `true` (the default): `component` accepts any tag or component;
+- `false`: there is no `component` prop at all;
+- an array: `component` accepts only the listed tags and components, plus the default `element`.
+
+**Enabled (`polymorphic: true`, the default)**
 
 ```tsx
 import { createComponent } from "@react-factory/create-component";
@@ -158,7 +166,7 @@ Renders to:
 
 `data-resolved-component` only shows up once polymorphism is actually exercised — the default `<h2>` case above doesn't get one.
 
-### Disabling polymorphism (`polymorphic`)
+**Disabled (`polymorphic: false`)**
 
 ```tsx
 import { createComponent } from "@react-factory/create-component";
@@ -185,6 +193,90 @@ Renders to:
 ```
 
 `data-resolved-component` can never appear here — there's no `component` prop to exercise.
+
+**Restricted (`polymorphic: [...]`)**
+
+Pass an array to accept only specific tags and components in `component`. The default `element` is always allowed and doesn't need to be listed.
+
+```tsx
+import { createComponent } from "@react-factory/create-component";
+
+type IconProps = {
+  name: string;
+};
+
+const Icon = createComponent<IconProps>()({
+  element: "i",
+  polymorphic: false,
+  Render: (Component, { name, ...props }) => (
+    <Component data-icon={name} {...props} />
+  ),
+});
+
+Icon.displayName = "Icon";
+
+const Caption = createComponent()({
+  element: "p",
+  polymorphic: ["span", "figcaption", Icon],
+  Render: (Component, props) => <Component {...props} />,
+});
+
+Caption.displayName = "Caption";
+
+// Usage
+<Caption>Renders as a p by default</Caption>
+<Caption component="span">Renders as a span</Caption>
+<Caption component={Icon} name="info" />
+
+// Type error: "a" isn't in the allow-list
+<Caption component="a" href="/docs" />
+```
+
+Renders to:
+
+```html
+<p data-origin-component="Caption">Renders as a p by default</p>
+<span data-resolved-component="FactorySpan" data-origin-component="Caption">
+  Renders as a span
+</span>
+<i
+  data-icon="info"
+  data-resolved-component="Icon"
+  data-origin-component="Caption"
+></i>
+```
+
+Native props still follow the chosen element: `href` is accepted on `component="a"` only if `"a"` is listed.
+
+In development, an unlisted `component` also throws at render time:
+
+```
+[create-component] Caption received component="a", which is not in its polymorphic allow-list. Allowed: "p", "span", "figcaption", Icon.
+```
+
+The runtime check exists because TypeScript compares components structurally: a different component whose type is identical to a listed one (same props and same static properties) passes the type check, but not the identity check at runtime. The check reads `process.env.NODE_ENV`, so bundlers drop it from production builds.
+
+The type-level restriction needs the list's literal types. Pass the array inline, or declare it with `as const`; a list typed as `ElementType[]` (or cast to it) keeps only the runtime check:
+
+```tsx
+import type { ElementType } from "react";
+
+const textElements = ["span", "strong"] as const;
+
+// Restricted at the type level and at runtime
+const Text = createComponent()({
+  polymorphic: textElements,
+  Render: (Component, props) => <Component {...props} />,
+});
+
+// Restricted at runtime only: `component` accepts any ElementType in types
+const looseElements: ElementType[] = ["span", "strong"];
+
+const LooseText = createComponent()({
+  polymorphic: looseElements,
+  Render: (Component, props) => <Component {...props} />,
+});
+```
 
 ### Memoization (`memo`)
 
@@ -380,6 +472,7 @@ The idea of using wrappers around the factory can be taken even further; you can
 
 - `createPolymorphicComponent` - components that explicitly support polymorphism
 - `createStrictComponent` – strict components that must always contain a single semantic element and ensure its stability (e.g., `<form />`, `<input />`)
+- `createTextComponent` – components that may only swap to a fixed set of elements, e.g. `defineCreateComponent({ polymorphic: ["span", "strong", "em"] })`
 - `create<WhatDoYouWant>Component` – any custom wrappers
 
 ```tsx
@@ -410,6 +503,38 @@ Form.displayName = "Form";
 ```
 
 ## Additional
+
+### Composing factory components
+
+A factory component can be passed as another factory component's `component`. The outer component consumes the `component` prop, so the inner one never receives its own and always renders its default `element`. Its props are therefore typed by its default element plus its custom props, whatever its own `polymorphic` setting:
+
+```tsx
+const Icon = createComponent<{ name: string }>()({
+  element: "i",
+  polymorphic: false,
+  Render: (Component, { name, ...props }) => (
+    <Component data-icon={name} {...props} />
+  ),
+});
+
+const Text = createComponent()({
+  element: "span",
+  polymorphic: ["strong", Icon],
+  Render: (Component, props) => <Component {...props} />,
+});
+
+const Button = createComponent()({
+  element: "button",
+  Render: (Component, props) => <Component {...props} />,
+});
+
+// Usage
+<Button component={Text}>Save</Button>   // typed as Text's default <span>
+<Button component={Icon} name="star" />  // Icon's custom props are required
+
+// Type error: href isn't a prop of Text's default <span>
+<Button component={Text} href="/docs">Save</Button>
+```
 
 ### Component metadata
 
@@ -447,22 +572,22 @@ However, the factory tries to work around this issue, and if you don't explicitl
 
 Options accepted by the second call, i.e. the descriptor passed to `createComponent<TCustomProps>()({ ... })`:
 
-| Property      | Type                                                    | Default     | Description                                                                                                                                                            |
-| ------------- | ------------------------------------------------------- | ----------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `element`     | `ElementType`                                           | `"div"`     | The default host tag or component rendered when no polymorphic `component` prop is supplied at call time.                                                              |
-| `Render`      | `(Component, props) => ReactNode \| Promise<ReactNode>` | _required_  | Produces the actual output for the resolved element and cleaned-up props. May be async for Server Components.                                                          |
-| `memo`        | `boolean \| (prev, next) => boolean`                    | `undefined` | Wraps the resulting component in `React.memo`. `true` uses the default shallow comparison; a function supplies a custom comparator. Omitted/`false` skips memoization. |
-| `polymorphic` | `boolean`                                               | `true`      | Whether the resulting component accepts a `component` prop that swaps the rendered element at call time. `false` removes `component` from the type entirely.           |
+| Property      | Type                                                    | Default     | Description                                                                                                                                                                                                                                                                         |
+| ------------- | ------------------------------------------------------- | ----------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `element`     | `ElementType`                                           | `"div"`     | The default host tag or component rendered when no polymorphic `component` prop is supplied at call time.                                                                                                                                                                           |
+| `Render`      | `(Component, props) => ReactNode \| Promise<ReactNode>` | _required_  | Produces the actual output for the resolved element and cleaned-up props. May be async for Server Components.                                                                                                                                                                       |
+| `memo`        | `boolean \| (prev, next) => boolean`                    | `undefined` | Wraps the resulting component in `React.memo`. `true` uses the default shallow comparison; a function supplies a custom comparator. Omitted/`false` skips memoization.                                                                                                              |
+| `polymorphic` | `boolean \| readonly ElementType[]`                     | `true`      | Whether the resulting component accepts a `component` prop that swaps the rendered element at call time. `false` removes `component` from the type entirely; an array accepts only the listed elements plus `element` (a type error otherwise, and a runtime error in development). |
 
 ### Produced component props
 
 Props accepted by the component returned from `createComponent<TCustomProps>()({ ... })`:
 
-| Property    | Type                                                  | Default                       | Description                                                                                                           |
-| ----------- | ----------------------------------------------------- | ----------------------------- | --------------------------------------------------------------------------------------------------------------------- |
-| `component` | `ElementType`                                         | `element` from the descriptor | Swaps the rendered element for this call only. Only present when `polymorphic` is `true` (the default).               |
-| `ref`       | inferred                                              | —                             | Forwarded straight to the resolved root — typed per the actually rendered element, no `forwardRef` required.          |
-| ...         | `TCustomProps & native props of the resolved element` | —                             | Everything else: your custom props plus the resolved element's own native props (custom props win on name conflicts). |
+| Property    | Type                                                  | Default                       | Description                                                                                                                                                                                  |
+| ----------- | ----------------------------------------------------- | ----------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `component` | `ElementType`                                         | `element` from the descriptor | Swaps the rendered element for this call only. Present when `polymorphic` is `true` (the default) or an allow-list array, in which case only `element` and the listed elements are accepted. |
+| `ref`       | inferred                                              | —                             | Forwarded straight to the resolved root — typed per the actually rendered element, no `forwardRef` required.                                                                                 |
+| ...         | `TCustomProps & native props of the resolved element` | —                             | Everything else: your custom props plus the resolved element's own native props (custom props win on name conflicts).                                                                        |
 
 ### `defineCreateComponent(defaultOptions)`
 
@@ -471,11 +596,11 @@ Returns a local factory shaped exactly like `createComponent`
 defaults below. Any of them can still be overridden per component; see
 [Local wrapper around the factory](#local-wrapper-around-the-factory).
 
-| Property      | Type                                 | Default     | Description                                                                        |
-| ------------- | ------------------------------------ | ----------- | ---------------------------------------------------------------------------------- |
-| `element`     | `ElementType`                        | `"div"`     | Default host tag or component for every component from the local factory.          |
-| `memo`        | `boolean \| (prev, next) => boolean` | `undefined` | Default memoization behavior. Same semantics as `createComponent`'s `memo`.        |
-| `polymorphic` | `boolean`                            | `true`      | Default polymorphism setting. Same semantics as `createComponent`'s `polymorphic`. |
+| Property      | Type                                 | Default     | Description                                                                                                                                                                                |
+| ------------- | ------------------------------------ | ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `element`     | `ElementType`                        | `"div"`     | Default host tag or component for every component from the local factory.                                                                                                                  |
+| `memo`        | `boolean \| (prev, next) => boolean` | `undefined` | Default memoization behavior. Same semantics as `createComponent`'s `memo`.                                                                                                                |
+| `polymorphic` | `boolean \| readonly ElementType[]`  | `true`      | Default polymorphism setting. Same semantics as `createComponent`'s `polymorphic`. A component that sets its own `polymorphic` replaces the default entirely (allow-lists are not merged). |
 
 `Render` isn't accepted here — it's specific to one component, so it stays required on every `localCreateComponent(...)(...)` call.
 
