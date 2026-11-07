@@ -3,6 +3,7 @@ import { createComponent } from "./create-component.factory";
 import type {
   CreateComponentFactoryDefaultOptions,
   CreateComponentFactoryOptions,
+  CreateComponentFactoryPolymorphicOption,
 } from "./create-component.types";
 import type { ElementType } from "react";
 
@@ -19,9 +20,11 @@ import type { ElementType } from "react";
  * @typeParam TDefaultElement - The default host tag or component every
  * component from the resulting local factory renders, unless it overrides
  * `element` itself. Defaults to `"div"`.
- * @typeParam TDefaultPolymorphic - Whether components from the resulting
- * local factory accept a `component` swap prop by default. Defaults to
- * `true`.
+ * @typeParam TDefaultPolymorphic - The default `polymorphic` option for
+ * components from the resulting local factory: `true`, `false`, or an
+ * allow-list array. Defaults to `true`. A component that sets its own
+ * `polymorphic` replaces the default entirely (lists are not merged); its
+ * own `element` is always allowed in addition to a default allow-list.
  * @param defaultOptions - Defaults for `element`, `memo`, and
  * `polymorphic`. See {@link CreateComponentFactoryDefaultOptions}.
  * @returns A function with the same shape as `createComponent`: call it
@@ -49,7 +52,8 @@ import type { ElementType } from "react";
  */
 export const defineCreateComponent = <
   TDefaultElement extends ElementType = "div",
-  TDefaultPolymorphic extends boolean = true,
+  const TDefaultPolymorphic extends CreateComponentFactoryPolymorphicOption =
+    true,
 >(
   defaultOptions?: CreateComponentFactoryDefaultOptions<TDefaultElement> & {
     polymorphic?: TDefaultPolymorphic;
@@ -62,7 +66,8 @@ export const defineCreateComponent = <
 
     return <
       TElement extends ElementType = TDefaultElement,
-      TPolymorphic extends boolean = TDefaultPolymorphic,
+      const TPolymorphic extends CreateComponentFactoryPolymorphicOption =
+        TDefaultPolymorphic,
     >(
       options: CreateComponentFactoryOptions<TElement, TCustomProps> & {
         polymorphic?: TPolymorphic;
