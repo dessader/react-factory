@@ -10,9 +10,9 @@ The same piece of front-end logic shows up in project after project, solved a li
 
 The scope stays narrow on purpose. The main goal is to create tools that help address common patterns and use cases and solve them in a targeted manner without introducing unnecessary complexity and without being tied to global architectural solutions.
 
-> Each package comes with its own documentation and a more detailed motivation section, which will help you better understand the problem it solves.
-
 ## Packages
 
-- **[`@react-factory/create-component`](./packages/create-component)** – a factory for building React components.
-- **[`@react-factory/create-context`](./packages/create-context)** – a factory for creating React context.
+| Package | Version | Description |
+| --- | --- | --- |
+| 📦 [`@react-factory/create-component`](./packages/create-component) | [![npm](https://img.shields.io/npm/v/@react-factory/create-component.svg)](https://www.npmjs.com/package/@react-factory/create-component) | A lightweight factory for building type-safe, polymorphic React components. |
+| 📦 [`@react-factory/create-context`](./packages/create-context) | [![npm](https://img.shields.io/npm/v/@react-factory/create-context.svg)](https://www.npmjs.com/package/@react-factory/create-context) | A tiny factory for creating a React context and providing convenient access to it. |
