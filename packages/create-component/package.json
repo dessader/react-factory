@@ -1,6 +1,6 @@
 {
   "name": "@react-factory/create-component",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "A lightweight factory for building type-safe, polymorphic React components.",
   "license": "MIT",
   "type": "module",

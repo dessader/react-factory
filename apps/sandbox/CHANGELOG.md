@@ -1,5 +1,14 @@
 # @react-factory/sandbox
 
+## 0.0.4
+
+### Patch Changes
+
+- Updated dependencies [2151dd5]
+- Updated dependencies [9f39caa]
+  - @react-factory/create-context@0.0.2
+  - @react-factory/create-component@0.3.0
+
 ## 0.0.3
 
 ### Patch Changes
