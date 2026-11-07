@@ -1,9 +1,11 @@
 import { memo as reactMemo, cloneElement, isValidElement } from "react";
-import { getComponentDisplayName } from "./utils";
+import { assertAllowedComponent, getComponentDisplayName } from "./utils";
 
 import type {
+  CreateComponentFactoryAllowedElement,
   CreateComponentFactoryOptions,
   CreateComponentFactoryComponentProps,
+  CreateComponentFactoryPolymorphicOption,
   CreateComponentFactoryResolvedComponentProps,
 } from "./create-component.types";
 import type { ElementType, ReactNode } from "react";
@@ -19,7 +21,10 @@ import type { ElementType, ReactNode } from "react";
  * - Renders through the supplied `Render` function, passing it the resolved
  *   element and cleaned-up props.
  * - Is polymorphic by default (`polymorphic: true`): an optional `component`
- *   prop lets callers swap the rendered element at call time.
+ *   prop lets callers swap the rendered element at call time. An array
+ *   restricts `component` to the listed elements plus the default
+ *   `element`: anything else is a type error, and a runtime error in
+ *   development.
  * - Tags its rendered output with `data-origin-component` (the first/outermost
  *   factory component in a composition chain) and, when polymorphism was
  *   exercised, `data-resolved-component` (what it resolved to).
@@ -55,7 +60,7 @@ export const createComponent = <
 >() => {
   return <
     TElement extends ElementType = "div",
-    TPolymorphic extends boolean = true,
+    const TPolymorphic extends CreateComponentFactoryPolymorphicOption = true,
   >({
     element,
     memo,
@@ -65,6 +70,9 @@ export const createComponent = <
     polymorphic?: TPolymorphic;
   }) => {
     const resolvedElement = element ?? ("div" as TElement);
+    const isPolymorphic = polymorphic !== false;
+    const allowedElements: readonly ElementType[] | undefined =
+      typeof polymorphic === "boolean" ? undefined : polymorphic;
 
     /**
      * Tags a `Render` result with the origin/resolved data attributes.
@@ -114,13 +122,18 @@ export const createComponent = <
      * The component produced by this call to `createComponent()(...)`.
      *
      * Resolves the polymorphic `component` prop (if `polymorphic` is
-     * enabled and one was supplied), strips it out of the forwarded props,
-     * invokes `Render`, and tags the result. Handles both synchronous
-     * results and `Promise<ReactNode>` (async Server Components).
+     * enabled and one was supplied), checks it against the allow-list in
+     * development, strips it out of the forwarded props, invokes `Render`,
+     * and tags the result. Handles both synchronous results and
+     * `Promise<ReactNode>` (async Server Components).
      *
-     * @typeParam TAs - The element resolved for this render call.
+     * @typeParam TAs - The element resolved for this render call,
+     * constrained to the allow-list when `polymorphic` is an array.
      */
-    const FactoryComponent = <TAs extends ElementType = TElement>(
+    const FactoryComponent = <
+      TAs extends CreateComponentFactoryAllowedElement<TElement, TPolymorphic> =
+        TElement,
+    >(
       props: CreateComponentFactoryComponentProps<
         TAs,
         TCustomProps,
@@ -131,12 +144,25 @@ export const createComponent = <
         component?: TAs;
       } & object;
 
-      const resolvedComponent = polymorphic
+      if (
+        process.env.NODE_ENV !== "production" &&
+        allowedElements !== undefined &&
+        component !== undefined
+      ) {
+        assertAllowedComponent(
+          FactoryComponent.displayName,
+          component,
+          resolvedElement,
+          allowedElements,
+        );
+      }
+
+      const resolvedComponent = isPolymorphic
         ? (component ?? resolvedElement)
         : resolvedElement;
 
       const resolvedComponentName =
-        polymorphic && component !== undefined
+        isPolymorphic && component !== undefined
           ? getComponentDisplayName(resolvedComponent)
           : undefined;
 

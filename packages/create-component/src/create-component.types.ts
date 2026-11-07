@@ -54,6 +54,43 @@ export type CreateComponentFactoryMemoOption<
 > = boolean | CreateComponentFactoryMemoFunction<TElement, TCustomProps>;
 
 /**
+ * Controls the polymorphic `component` prop of a factory component.
+ *
+ * - `true` accepts any intrinsic tag or component.
+ * - `false` removes the `component` prop entirely.
+ * - An array accepts only the listed tags and components, plus the
+ *   factory's default `element`, which is always allowed. Anything else is a
+ *   type error at the usage site and, in development, a runtime error.
+ */
+export type CreateComponentFactoryPolymorphicOption =
+  boolean | readonly ElementType[];
+
+/**
+ * The union of elements a factory component's `component` prop accepts.
+ *
+ * Always includes `TElement`. On top of it, resolves to `ElementType` for
+ * `true`, to the listed elements for an allow-list array, and to nothing
+ * else for `false` (where the `component` prop is absent anyway).
+ *
+ * `TElement` sits at the top level of the union, outside the conditional,
+ * so a generic `TAs extends CreateComponentFactoryAllowedElement<...>` can
+ * still default to `TElement` while `TPolymorphic` is unresolved.
+ *
+ * @typeParam TElement - The factory's default element, always allowed.
+ * @typeParam TPolymorphic - The factory's `polymorphic` option.
+ */
+export type CreateComponentFactoryAllowedElement<
+  TElement extends ElementType,
+  TPolymorphic extends CreateComponentFactoryPolymorphicOption,
+> =
+  | TElement
+  | (TPolymorphic extends readonly (infer TAllowed extends ElementType)[]
+      ? TAllowed
+      : TPolymorphic extends false
+        ? never
+        : ElementType);
+
+/**
  * Options accepted by the factory function returned from
  * `createComponent<TCustomProps>()`.
  *
@@ -75,10 +112,11 @@ export type CreateComponentFactoryOptions<
    */
   memo?: CreateComponentFactoryMemoOption<TElement, TCustomProps>;
   /**
-   * Whether the resulting component accepts a `component` prop that swaps
-   * the rendered element at call time. Defaults to `true`.
+   * Whether, and to what, the resulting component's `component` prop can
+   * swap the rendered element at call time. Defaults to `true`. See
+   * {@link CreateComponentFactoryPolymorphicOption}.
    */
-  polymorphic?: boolean;
+  polymorphic?: CreateComponentFactoryPolymorphicOption;
   /**
    * Produces the React output for the resolved element and props. See
    * {@link CreateComponentFactoryRenderFunction}.
@@ -117,26 +155,29 @@ export type CreateComponentFactoryDefaultOptions<TElement extends ElementType> =
 /**
  * The props accepted by the component produced by the factory.
  *
- * When `TPolymorphic` is `true` (the default), an optional `component`
- * prop lets callers swap the rendered element for a different intrinsic
- * tag or component at call time.
+ * When `TPolymorphic` is `true` (the default) or an allow-list array, an
+ * optional `component` prop lets callers swap the rendered element for a
+ * different intrinsic tag or component at call time. Which values it
+ * accepts is constrained on the component itself, via
+ * {@link CreateComponentFactoryAllowedElement}. When `TPolymorphic` is
+ * `false`, the prop is absent.
  *
  * @typeParam TAs - The intrinsic tag or component being rendered for this
  * usage (may differ from the factory's default `element` when polymorphism
  * is exercised).
  * @typeParam TCustomProps - The factory's own custom prop shape.
- * @typeParam TPolymorphic - Whether the `component` swap prop is included.
+ * @typeParam TPolymorphic - The factory's `polymorphic` option.
  */
 export type CreateComponentFactoryComponentProps<
   TAs extends ElementType,
   TCustomProps,
-  TPolymorphic extends boolean = true,
-> = TPolymorphic extends true
-  ? {
+  TPolymorphic extends CreateComponentFactoryPolymorphicOption = true,
+> = TPolymorphic extends false
+  ? CreateComponentFactoryResolvedComponentProps<TAs, TCustomProps>
+  : {
       /** Swaps the rendered element for this call only. */
       component?: TAs;
-    } & CreateComponentFactoryResolvedComponentProps<TAs, TCustomProps>
-  : CreateComponentFactoryResolvedComponentProps<TAs, TCustomProps>;
+    } & CreateComponentFactoryResolvedComponentProps<TAs, TCustomProps>;
 
 /**
  * A custom prop-comparison function for
