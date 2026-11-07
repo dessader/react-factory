@@ -45,9 +45,14 @@ reads it. See [Examples](#examples) for how to render and read it, and
 
 > ℹ️ **About context naming**
 >
-> By default, the factory adds the suffix `ContextProvider` to the host name, `createContext<...>("Counter")` turn into `CounterContextProvider` in debug errors. We recommend extracting providers from the tuple returned by the factory using this exact naming convention, because it clearly conveys the component purpose. At this time, hostname transforming is a "by design" feature of the factory and cannot be configured. A future release will introduce the `transformContextName` option, which will allow for flexible control over this behavior.
+> The factory names the Provider by appending the `ContextProvider` suffix to `host`: `createContext<...>("Counter")` produces a Provider whose `displayName` is `CounterContextProvider`, and the same name appears in the error thrown when a consumer is rendered outside it. This is fixed library behavior and cannot be configured.
 >
-> Example: `const [<HostName>ContextProvider, use<HostName>Context] = createContext<...>("Counter");`
+> To keep the names in your code consistent with what React DevTools and error messages show, name the tuple elements after the same convention:
+>
+> - Provider: `<Host>ContextProvider`
+> - Hook: `use<Host>Context`
+>
+> Example: `const [CounterContextProvider, useCounterContext] = createContext<...>("Counter");`
 
 ## Examples
 
